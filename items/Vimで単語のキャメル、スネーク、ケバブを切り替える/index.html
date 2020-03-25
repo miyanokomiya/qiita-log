@@ -1,0 +1,16 @@
+<p>たまに欲しくなるけどさっと調べてもいい感じの方法が見つからず、そこまで必要に迫られてもなくて毎回手作業していた変換をやっとコマンドにしたメモ。<br>
+マップは空いていそうなキーへ適当に。</p>
+
+<div class="code-frame" data-lang="vim"><div class="highlight"><pre>nnoremap <span class="p">&lt;</span>Space<span class="p">&gt;</span><span class="k">c</span> viw<span class="p">:</span>s<span class="sr">/\%V\(_\\|-\)\(.\)/</span>\<span class="k">u</span>\<span class="m">2</span>/<span class="k">g</span><span class="p">&lt;</span>CR<span class="p">&gt;</span>
+nnoremap <span class="p">&lt;</span>Space<span class="p">&gt;</span>_ viw<span class="p">:</span>s<span class="sr">/\%V\([A-Z]\)/</span>_\<span class="k">l</span>\<span class="m">1</span>/<span class="k">g</span><span class="p">&lt;</span>CR<span class="p">&gt;</span>
+nnoremap <span class="p">&lt;</span>Space<span class="p">&gt;-</span> viw<span class="p">:</span>s<span class="sr">/\%V\([A-Z]\)/</span><span class="p">-</span>\<span class="k">l</span>\<span class="m">1</span>/<span class="k">g</span><span class="p">&lt;</span>CR<span class="p">&gt;</span>
+xnoremap <span class="p">&lt;</span>Space<span class="p">&gt;</span><span class="k">c</span> <span class="p">:</span>s<span class="sr">/\%V\(_\\|-\)\(.\)/</span>\<span class="k">u</span>\<span class="m">2</span>/<span class="k">g</span><span class="p">&lt;</span>CR<span class="p">&gt;</span>
+xnoremap <span class="p">&lt;</span>Space<span class="p">&gt;</span>_ <span class="p">:</span>s<span class="sr">/\%V\([A-Z]\)/</span>_\<span class="k">l</span>\<span class="m">1</span>/<span class="k">g</span><span class="p">&lt;</span>CR<span class="p">&gt;</span>
+xnoremap <span class="p">&lt;</span>Space<span class="p">&gt;-</span> <span class="p">:</span>s<span class="sr">/\%V\([A-Z]\)/</span><span class="p">-</span>\<span class="k">l</span>\<span class="m">1</span>/<span class="k">g</span><span class="p">&lt;</span>CR<span class="p">&gt;</span>
+</pre></div></div>
+
+<p>スネーク &lt;-&gt; ケバブの変換は使うシーンがなさそうなので略。</p>
+
+<p>参考サイト<br>
+<a href="https://qiita.com/annyamonnya/items/f003fd671fecaf55c9e7" class="autolink" id="reference-cf657b5592df3a5b959f">https://qiita.com/annyamonnya/items/f003fd671fecaf55c9e7</a><br>
+<a href="https://nanasi.jp/articles/howto/editing/replace-selecttext.html" class="autolink" rel="nofollow noopener" target="_blank">https://nanasi.jp/articles/howto/editing/replace-selecttext.html</a></p>

@@ -1,0 +1,129 @@
+
+<h2>
+<span id="やりたいこと" class="fragment"></span><a href="#%E3%82%84%E3%82%8A%E3%81%9F%E3%81%84%E3%81%93%E3%81%A8"><i class="fa fa-link"></i></a>やりたいこと</h2>
+
+<p>こういう中身がくり抜かれたポリゴンをHTMLのcanvasで描画したい。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F6dfb5b7f-eb03-0325-7ac9-0466f0f2fbc5.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=e419ac59d0c15bd4987a673ae7b39f8b" target="_blank" rel="nofollow noopener"><img width="180" alt="スクリーンショット 2019-05-03 19.29.39.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F6dfb5b7f-eb03-0325-7ac9-0466f0f2fbc5.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=e419ac59d0c15bd4987a673ae7b39f8b" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/6dfb5b7f-eb03-0325-7ac9-0466f0f2fbc5.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F6dfb5b7f-eb03-0325-7ac9-0466f0f2fbc5.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=bd21264faa0fdfac7334f3bc86962632 1x" loading="lazy"></a></p>
+
+<h2>
+<span id="真っ先に浮かぶ方法" class="fragment"></span><a href="#%E7%9C%9F%E3%81%A3%E5%85%88%E3%81%AB%E6%B5%AE%E3%81%8B%E3%81%B6%E6%96%B9%E6%B3%95"><i class="fa fa-link"></i></a>真っ先に浮かぶ方法</h2>
+
+<p>ブレンドモードを指定してポリゴンの重なり部分を切り取る方法。</p>
+
+<div class="code-frame" data-lang="js"><div class="highlight"><pre><span class="nx">ctx</span><span class="p">.</span><span class="nx">globalCompositeOperation</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">xor</span><span class="dl">'</span>
+</pre></div></div>
+
+<p><a href="https://www.yoheim.net/blog.php?q=20121206" class="autolink" rel="nofollow noopener" target="_blank">https://www.yoheim.net/blog.php?q=20121206</a></p>
+
+<p>しかしこの方法は、「今のcanvasに描画されている部分」と「これから描画するポリゴン」の重なり部分が切り取られてしまう。</p>
+
+<p>つまりこのような描画をしておいて、</p>
+
+<div class="code-frame" data-lang="js"><div class="highlight"><pre>  <span class="nx">ctx</span><span class="p">.</span><span class="nx">fillStyle</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">red</span><span class="dl">'</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">()</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">moveTo</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">150</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">150</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">closePath</span><span class="p">()</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">fill</span><span class="p">()</span>
+
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">fillStyle</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">blue</span><span class="dl">'</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">()</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">moveTo</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">120</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">120</span><span class="p">,</span> <span class="mi">150</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">150</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">closePath</span><span class="p">()</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">fill</span><span class="p">()</span>
+</pre></div></div>
+
+<p><a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F4855a464-539c-0331-9f37-2cc7dfee3653.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=724bf9578c03fcd0f99e8ddd2683ced6" target="_blank" rel="nofollow noopener"><img width="177" alt="スクリーンショット 2019-05-03 19.24.43.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F4855a464-539c-0331-9f37-2cc7dfee3653.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=724bf9578c03fcd0f99e8ddd2683ced6" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/4855a464-539c-0331-9f37-2cc7dfee3653.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F4855a464-539c-0331-9f37-2cc7dfee3653.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=5d4ddd8a632083da375061d32cffba3f 1x" loading="lazy"></a></p>
+
+<p>くり抜き描画を追加で行うと、</p>
+
+<div class="code-frame" data-lang="js"><div class="highlight"><pre>  <span class="nx">ctx</span><span class="p">.</span><span class="nx">globalCompositeOperation</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">xor</span><span class="dl">'</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">()</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">moveTo</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">120</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="mi">120</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">closePath</span><span class="p">()</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">fill</span><span class="p">()</span>
+</pre></div></div>
+
+<p>こうなる。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fbf19b8b8-1cda-1779-631d-eda4b8bfa7d8.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=31a030f21340bfdd4f46ca4075ad4190" target="_blank" rel="nofollow noopener"><img width="175" alt="スクリーンショット 2019-05-03 19.26.26.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fbf19b8b8-1cda-1779-631d-eda4b8bfa7d8.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=31a030f21340bfdd4f46ca4075ad4190" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/bf19b8b8-1cda-1779-631d-eda4b8bfa7d8.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fbf19b8b8-1cda-1779-631d-eda4b8bfa7d8.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=b214da129c97f6b06d6ce97d127d6b76 1x" loading="lazy"></a></p>
+
+<p>違うんだ、こうなって欲しいんだという願いは叶わない。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F6dfb5b7f-eb03-0325-7ac9-0466f0f2fbc5.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=e419ac59d0c15bd4987a673ae7b39f8b" target="_blank" rel="nofollow noopener"><img width="180" alt="スクリーンショット 2019-05-03 19.29.39.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F6dfb5b7f-eb03-0325-7ac9-0466f0f2fbc5.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=e419ac59d0c15bd4987a673ae7b39f8b" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/6dfb5b7f-eb03-0325-7ac9-0466f0f2fbc5.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F6dfb5b7f-eb03-0325-7ac9-0466f0f2fbc5.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=bd21264faa0fdfac7334f3bc86962632 1x" loading="lazy"></a></p>
+
+<h2>
+<span id="欲しかった方法" class="fragment"></span><a href="#%E6%AC%B2%E3%81%97%E3%81%8B%E3%81%A3%E3%81%9F%E6%96%B9%E6%B3%95"><i class="fa fa-link"></i></a>欲しかった方法</h2>
+
+<p>SVGの挙動を調べていたらこういう仕様を見つけた。</p>
+
+<blockquote>
+<p>path要素においてはfill-ruleがnonzeroであっても，白抜きとなるケースが発生する．複数のパスから構成されたpash図形であった場合，互いにパスの向きが逆向きであった場合は，内側と外側とが打ち消し合い，fill対象の領域から除外される．</p>
+</blockquote>
+
+<p>出展サイト：<a href="http://defghi1977.html.xdomain.jp/tech/svgMemo/svgMemo_03.htm" class="autolink" rel="nofollow noopener" target="_blank">http://defghi1977.html.xdomain.jp/tech/svgMemo/svgMemo_03.htm</a></p>
+
+<p>そしてこれは、canvasでも成り立つ。<br>
+つまりこう書けば、</p>
+
+<div class="code-frame" data-lang="js"><div class="highlight"><pre>  <span class="nx">ctx</span><span class="p">.</span><span class="nx">fillStyle</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">red</span><span class="dl">'</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">()</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">moveTo</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">150</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">150</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">closePath</span><span class="p">()</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">fill</span><span class="p">()</span>
+
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">fillStyle</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">blue</span><span class="dl">'</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">()</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">moveTo</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">120</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">120</span><span class="p">,</span> <span class="mi">150</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">150</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">closePath</span><span class="p">()</span>
+
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">moveTo</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="mi">120</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">120</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">closePath</span><span class="p">()</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">fill</span><span class="p">()</span>
+</pre></div></div>
+
+<p>これが手に入る。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F6dfb5b7f-eb03-0325-7ac9-0466f0f2fbc5.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=e419ac59d0c15bd4987a673ae7b39f8b" target="_blank" rel="nofollow noopener"><img width="180" alt="スクリーンショット 2019-05-03 19.29.39.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F6dfb5b7f-eb03-0325-7ac9-0466f0f2fbc5.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=e419ac59d0c15bd4987a673ae7b39f8b" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/6dfb5b7f-eb03-0325-7ac9-0466f0f2fbc5.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F6dfb5b7f-eb03-0325-7ac9-0466f0f2fbc5.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=bd21264faa0fdfac7334f3bc86962632 1x" loading="lazy"></a></p>
+
+<p>ポイントはここ。<br>
+くり抜かれる側の矩形と、くり抜き範囲となる側の矩形で座標定義の回転方向が逆向きになっている。そして同じ<code>beginPath()</code>の中でパスを作ってから一気に<code>fill()</code>する。<br>
+要するにSVGでの仕様と同じ。SVGというよりは、もっと根底にある描画システム的な共通仕様なのかもしれない。</p>
+
+<div class="code-frame" data-lang="js"><div class="highlight"><pre>  <span class="nx">ctx</span><span class="p">.</span><span class="nx">fillStyle</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">blue</span><span class="dl">'</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">()</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">moveTo</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">120</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">120</span><span class="p">,</span> <span class="mi">150</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">150</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">closePath</span><span class="p">()</span>
+
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">moveTo</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="mi">120</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">120</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">lineTo</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">closePath</span><span class="p">()</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">fill</span><span class="p">()</span>
+</pre></div></div>
+
+<p>回転方向を交互に変えていけばさらにくり抜きをネストしていくこともできてしまう。楽しい。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F0a49a85f-5440-39f3-96f2-d46591813dbc.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=25a79304e87421a028da129bad4711f6" target="_blank" rel="nofollow noopener"><img width="170" alt="スクリーンショット 2019-05-03 19.44.15.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F0a49a85f-5440-39f3-96f2-d46591813dbc.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=25a79304e87421a028da129bad4711f6" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/0a49a85f-5440-39f3-96f2-d46591813dbc.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F0a49a85f-5440-39f3-96f2-d46591813dbc.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=f7b47a447f0b5d5536ae1faaf8ab8f22 1x" loading="lazy"></a></p>
+
+<p>もちろん包含関係になくても<code>xor</code>な描画として使うことができるので、今まで頑張って座標をポチポチ作っていた場面でもスパッと<code>xor</code>を決めることができてしまう。</p>
+
+<p>昔仕事でこういうくり抜きが欲しくて調べまくったのに結局わからず諦めたことがあったが、canvasではなくSVGを調べることで思わぬリベンジを果たすことができた。<br>
+これからは思う存分くり抜きまくろう。</p>

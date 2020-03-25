@@ -1,0 +1,39 @@
+
+<h2>
+<span id="問題意識" class="fragment"></span><a href="#%E5%95%8F%E9%A1%8C%E6%84%8F%E8%AD%98"><i class="fa fa-link"></i></a>問題意識</h2>
+
+<p><a href="https://github.com/junegunn/fzf" rel="nofollow noopener" target="_blank">fzf</a>により生産性とQuality of Vimが桁違いに向上している今日このごろ、<code>:Ag</code>コマンドで隠しファイル（ドットファイル、dotfiles）が検索対象ファイルにならないことが密かに気になっていた。</p>
+
+<p>そしてやっと隠しファイルも検索対象とする設定を書けたので、もしかしたら世界の誰かのQOV向上に貢献できるかもしれないということでここにメモ。  </p>
+
+<h2>
+<span id="解決方法" class="fragment"></span><a href="#%E8%A7%A3%E6%B1%BA%E6%96%B9%E6%B3%95"><i class="fa fa-link"></i></a>解決方法</h2>
+
+<p>プラグインは<a href="https://github.com/Shougo/dein.vim" rel="nofollow noopener" target="_blank">deiin</a>で管理しているので<code>.dein.toml</code>形式で抜粋。fzfと<a href="https://github.com/ggreer/the_silver_searcher" rel="nofollow noopener" target="_blank">ag</a>は別途インストール済ということで。</p>
+
+<div class="code-frame" data-lang="vim"><div class="highlight"><pre># <span class="p">.</span>dein<span class="p">.</span>toml
+
+<span class="p">[[</span>plugins<span class="p">]]</span>
+repo <span class="p">=</span> <span class="s1">'junegunn/fzf.vim'</span>
+hook_add <span class="p">=</span> <span class="s1">''</span>'
+<span class="c">" fzfは単体でインストールしているのでそこへのパス</span>
+<span class="k">set</span> rtp<span class="p">+=</span><span class="sr">/usr/</span>local<span class="sr">/opt/</span>fzf
+<span class="c">" dotファイルを含める&amp;プレビュー</span>
+command<span class="p">!</span> <span class="p">-</span>bang <span class="p">-</span>nargs<span class="p">=</span>? <span class="p">-</span>complete<span class="p">=</span><span class="k">dir</span> Files
+<span class="se">  \</span> <span class="k">call</span> fzf#<span class="k">vim</span>#<span class="k">files</span><span class="p">(&lt;</span><span class="k">q</span><span class="p">-</span>args<span class="p">&gt;,</span> fzf#<span class="k">vim</span>#with_preview<span class="p">({</span><span class="s1">'source'</span><span class="p">:</span> <span class="s1">'ag --hidden --ignore .git -g ""'</span><span class="p">}),</span> <span class="p">&lt;</span>bang<span class="p">&gt;</span><span class="m">0</span><span class="p">)</span>
+command<span class="p">!</span> <span class="p">-</span>bang <span class="p">-</span>nargs<span class="p">=</span>* Ag
+<span class="se">  \</span> <span class="k">call</span> fzf#<span class="k">vim</span>#<span class="k">grep</span><span class="p">(</span>
+<span class="se">  \</span>   <span class="s1">'ag --column --color --hidden --ignore .git '</span><span class="p">.</span>shellescape<span class="p">(&lt;</span><span class="k">q</span><span class="p">-</span>args<span class="p">&gt;),</span> <span class="m">0</span><span class="p">,</span>
+<span class="se">  \</span>   <span class="p">&lt;</span>bang<span class="p">&gt;</span><span class="m">0</span> ? fzf#<span class="k">vim</span>#with_preview<span class="p">(</span><span class="s1">'up:60%'</span><span class="p">)</span>
+<span class="se">  \</span>           <span class="p">:</span> fzf#<span class="k">vim</span>#with_preview<span class="p">(</span><span class="s1">'right:50%'</span><span class="p">,</span> <span class="s1">'?'</span><span class="p">),</span>
+<span class="se">  \</span>   <span class="p">&lt;</span>bang<span class="p">&gt;</span><span class="m">0</span><span class="p">)</span>
+<span class="s1">''</span>'
+</pre></div></div>
+
+<p><a href="https://github.com/junegunn/fzf.vim#advanced-customization" rel="nofollow noopener" target="_blank">fzf.vimのREADME</a>を参考に、<code>:Files</code>コマンドは<code>.gitignore</code>されていない全ファイルを対象にする。この書き方のソースは失念、多分検索すれば似たようなものがでてくるはず。</p>
+
+<p>そして今回やっと成功したのが<code>:Ag</code>コマンドの設定。READMEに書いてある<code>fzf#vim#ag</code>を<code>call</code>する書き方だと<code>ag</code>への引数は<a href="https://github.com/junegunn/fzf.vim/blob/7bf940d261795b5164bc854f37a121fcca927941/autoload/fzf/vim.vim#L691-L696" rel="nofollow noopener" target="_blank">内部で固定</a>されてしまっているらしく、うまくいかなかった。<br>
+なのでこちらは諦めて、<code>:Rg</code>用の書き方として載っていた<code>fzf#vim#grep</code>を<code>call</code>する書き方を弄ってみたらうまくいった。</p>
+
+<p>第二引数に<code>0</code>を渡しているのは、<code>1</code>を渡したら<code>:Ag</code>で検索したファイルを開いたときになぜか同時に文字列（検索ワード？）が書き込まれることがあるという謎の現象に遭遇したため。<code>0</code>に変えてみたら再現しなくなったのでこれで落ち着いている。<br>
+<a href="https://github.com/junegunn/fzf.vim/blob/7bf940d261795b5164bc854f37a121fcca927941/autoload/fzf/vim.vim#L710-L716" rel="nofollow noopener" target="_blank">fzfに<code>column</code>オプションを指定</a>するための引数っぽいが、よく分からない。<code>ag --column</code>と同じ機能で、fzf側でも指定すると競合して変な挙動になるとかかもしれない。求むfzf強者。</p>

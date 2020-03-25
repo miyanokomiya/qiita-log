@@ -1,0 +1,48 @@
+
+<h2>
+<span id="解決したかったこと" class="fragment"></span><a href="#%E8%A7%A3%E6%B1%BA%E3%81%97%E3%81%9F%E3%81%8B%E3%81%A3%E3%81%9F%E3%81%93%E3%81%A8"><i class="fa fa-link"></i></a>解決したかったこと</h2>
+
+<p>例えばこんな感じのi18n用resourceファイルがあったとして、<code>Login</code>という文字列を表示したければ、<code>header.menu.label.login</code>というキーを書く必要がある。</p>
+
+<div class="code-frame" data-lang="json"><div class="highlight"><pre><span class="p">{</span><span class="w">
+  </span><span class="nl">"header"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"menu"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"label"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"help"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Help"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"login"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Login"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"logout"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Logout"</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+   </span><span class="p">}</span><span class="w">
+ </span><span class="p">}</span><span class="w">
+</span></pre></div></div>
+
+<p>手動で。</p>
+
+<p>階層が深くルートまでが画面に収まっていなければ、スクロールして親を辿っていかなければならない。</p>
+
+<p>もちろん手動で。</p>
+
+<p>エディタが賢いとキーを書いているときにそれっぽく補完してくれたりもするが、最終地点の<code>Login</code>という場所が分かっているのだから、ちまちま補完などせずに一発でキーを取得したいと長らく願い続けてきた。</p>
+
+<h2>
+<span id="プラグイン作った" class="fragment"></span><a href="#%E3%83%97%E3%83%A9%E3%82%B0%E3%82%A4%E3%83%B3%E4%BD%9C%E3%81%A3%E3%81%9F"><i class="fa fa-link"></i></a>プラグイン作った</h2>
+
+<p>いい感じのプラグインがきっとあるだろうと探し回ったりしたものの、どうもそれらしきものは見つからなかった。もしかして誰も困ってないのだろうか、それとも探し方が悪いだけなのだろうかと悩む日々を過ごすうちに、大した処理でもなさそうだし自分で作ったほうが早いのではということで早速作ってみた。<br>
+<a href="https://github.com/miyanokomiya/key-seeker.nvim" class="autolink" rel="nofollow noopener" target="_blank">https://github.com/miyanokomiya/key-seeker.nvim</a></p>
+
+<p>キーが欲しい行にカーソルを置いて<code>:KeySeekerClip</code>を実行すると、ルートからその行までのキーを<code>.</code>で連結した文字列をヤンクしてくれるだけ。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Ff19fb5fb-0f5a-d05f-f9e3-0cab21afc8ed.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=ad46c45fe3e54ee2a6cc97a4b24e57de" target="_blank" rel="nofollow noopener"><img src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Ff19fb5fb-0f5a-d05f-f9e3-0cab21afc8ed.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=ad46c45fe3e54ee2a6cc97a4b24e57de" alt="Apr-23-2019 18-37-40.gif" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/f19fb5fb-0f5a-d05f-f9e3-0cab21afc8ed.gif" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Ff19fb5fb-0f5a-d05f-f9e3-0cab21afc8ed.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=ce8ae146527e25c515b0943fa545da57 1x" loading="lazy"></a></p>
+
+<p><a href="https://github.com/neovim/neovim" rel="nofollow noopener" target="_blank">neovim</a>のrpluginを使ってpythonでプラグインを書ける<a href="https://github.com/neovim/pynvim" rel="nofollow noopener" target="_blank">pynvim</a>を使っているので実質neovim用。<br>
+vimscriptを完全に理解できていない新参者にもなんとなくプラグインを作らせてくれる最高の仕組みだった。<br>
+ちなみになんとなく選んだもののpythonもほぼ触ったことはないので、<code>import</code>まわりにとても苦戦した。得意な環境で勝負することをおすすめしたい。</p>
+
+<h2>
+<span id="妥協点" class="fragment"></span><a href="#%E5%A6%A5%E5%8D%94%E7%82%B9"><i class="fa fa-link"></i></a>妥協点</h2>
+
+<p>リポジトリを覗いてもらうと分かるが、全然実装は頑張っていない。ただそれっぽく動いてくれる程度の代物で、対応できるファイルフォーマットもそこそこの制限がある。<br>
+ただ今回の動機となったi18nのresourceファイルでは（おそらく他のほとんどのjsonファイルでも）、そんな変な書き方はしないだろうということで妥協しまくっている。<br>
+そもそもjsonとしてパースしてすらいない。そのかわりにyamlファイルでもなんとなく使える。</p>
+
+<p>このあたりは実際に問題にぶつかったらまた頑張るかもしれない。それか「このプラグイン使えばいいYO!」という情報が現れるのが先かもしれない。</p>

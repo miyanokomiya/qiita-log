@@ -1,0 +1,38 @@
+
+<h2>
+<span id="困った" class="fragment"></span><a href="#%E5%9B%B0%E3%81%A3%E3%81%9F"><i class="fa fa-link"></i></a>困った</h2>
+
+<p>手元で<code>eslint --fix</code>すると動くのに、ALE経由だと何も起きなくなってしまった。</p>
+
+<p>原因は最近出るようになったtypescriptバージョン関連の警告。<br>
+ALEは標準出力をパースしていい感じにしてくれているが、この警告が邪魔をしてパースに失敗していた。<br>
+パースしてても正常系で通ってしまうらしく、エラー表示も何もなかったので見つけるのになかなか手間取った。</p>
+
+<div class="code-frame" data-lang="sh"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cat </span>src/components/Shelf.tsx| npx eslint <span class="nt">--parser-options</span><span class="o">=</span>warnOnUnsupportedTypeScriptVersion:true  <span class="nt">--stdin-filename</span> src/components/Shelf.tsx <span class="nt">--stdin</span> <span class="nt">--fix-dry-run</span> <span class="nt">--format</span><span class="o">=</span>json
+<span class="o">=============</span>
+
+WARNING: You are currently running a version of TypeScript which is not officially supported by typescript-estree.
+
+You may find that it works just fine, or you may not.
+
+SUPPORTED TYPESCRIPT VERSIONS: <span class="o">&gt;=</span>3.2.1 &lt;3.6.0
+
+YOUR TYPESCRIPT VERSION: 3.6.2
+
+Please only submit bug reports when using the officially supported version.
+
+<span class="o">=============</span>
+<span class="o">[{</span><span class="s2">"filePath"</span>:<span class="s2">"~/develop/web/rn-sample/src/components/Shelf.tsx"</span>,<span class="s2">"messages"</span>:[],<span class="s2">"errorCount"</span>:0,<span class="s2">"warningCount"</span>:0,<span class="s2">"fixableErrorCount"</span>:0,<span class="s2">"fixableWarningCount"</span>:0,<span class="s2">"output"</span>:<span class="s2">"import React, { FC } from 'react'</span><span class="se">\n\n</span><span class="s2">const Shelf: FC = () =&gt; {</span><span class="se">\n</span><span class="s2">  return &lt;div&gt;aaaa&lt;/div&gt;</span><span class="se">\n</span><span class="s2">}</span><span class="se">\n\n</span><span class="s2">export default Shelf</span><span class="se">\n</span><span class="s2">"</span><span class="o">}]</span>
+</pre></div></div>
+
+<p>とても存在感のある警告表示。しかしそこは後続連携で大事な大事な標準出力なのである。</p>
+
+<h2>
+<span id="対処法" class="fragment"></span><a href="#%E5%AF%BE%E5%87%A6%E6%B3%95"><i class="fa fa-link"></i></a>対処法</h2>
+
+<p><a href="https://github.com/typescript-eslint/typescript-eslint/issues/393#issuecomment-511115374" class="autolink" rel="nofollow noopener" target="_blank">https://github.com/typescript-eslint/typescript-eslint/issues/393#issuecomment-511115374</a><br>
+オプションで警告を消すことができるので消してしまう。<br>
+あるいは警告に素直に従ってバージョンを調整する。</p>
+
+<p>ALEへのPRチャンスかと一瞬思ったが、eslint本体ではなくtypescript用のプラグインが警告出力を上乗せしてきているっぽいので、ALE側で何とかするべきものでもなさそうな気配。<br>
+せめて他の嵌り人の助けになってくれということでここにメモ。</p>

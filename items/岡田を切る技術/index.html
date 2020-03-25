@@ -1,0 +1,400 @@
+
+<h2>
+<span id="これはとある回顧録" class="fragment"></span><a href="#%E3%81%93%E3%82%8C%E3%81%AF%E3%81%A8%E3%81%82%E3%82%8B%E5%9B%9E%E9%A1%A7%E9%8C%B2"><i class="fa fa-link"></i></a>これはとある回顧録</h2>
+
+<p>何度も諦めかけましたが、数年の歳月を経て遂に岡田を切る技術が一旦の完成へと至りました。その技術を巡る奮闘の歴史と成果について、ここに記録を残していきたいと思います。</p>
+
+<h2>
+<span id="画像時代" class="fragment"></span><a href="#%E7%94%BB%E5%83%8F%E6%99%82%E4%BB%A3"><i class="fa fa-link"></i></a>画像時代</h2>
+
+<p>まずは「切る」という動作が何を指すかを明確にしておきます。<br>
+厳密な定義というよりは、切った感を得るために必要そうなふるまいとして定義します。</p>
+
+<ol>
+<li>平面上のある領域が、任意の直線を境界として分割されること</li>
+<li>分割された領域は物理法則に準じてふるまうこと</li>
+</ol>
+
+<p>要するに気持ちよく岡田を切ることができれば目標は無事達成です。</p>
+
+<h3>
+<span id="物理エンジン" class="fragment"></span><a href="#%E7%89%A9%E7%90%86%E3%82%A8%E3%83%B3%E3%82%B8%E3%83%B3"><i class="fa fa-link"></i></a>物理エンジン</h3>
+
+<p>切った感を高めるためにはやはり「物理法則」に準じたふるまいが欲しくなります。つまりブラウザ上で動く物理エンジンが必要です。<br>
+世の中にはフルスクラッチで物理エンジンを作れる人間と作れない人間が居ると思われますが、残念ながら私は後者でした。勝ち目の薄い勝負は避け、素直に巨人の方にすがります。</p>
+
+<p>今回採用したのはmatter.jsというjavascript製の2D物理エンジンです。<br>
+<a href="http://brm.io/matter-js/" class="autolink" rel="nofollow noopener" target="_blank">http://brm.io/matter-js/</a></p>
+
+<p>リンク先のデモを見てもらうと分かりますが、めっちゃ物理エンジンしています。描画機能も内蔵しているのでそのまま使うだけで物理エンジン制御下の世界をさっとwebページ上に作り出せます。</p>
+
+<p><strong>「でもこの物理エンジンだけでは岡田は切れないから・・」</strong>と自分がやるべきことはまだ残っているんだと必死に言い聞かせて先に進みます。</p>
+
+<h3>
+<span id="最古の岡田" class="fragment"></span><a href="#%E6%9C%80%E5%8F%A4%E3%81%AE%E5%B2%A1%E7%94%B0"><i class="fa fa-link"></i></a>最古の岡田</h3>
+
+<p>作図系な処理において最も基本的かつ扱いやすいのは矩形でしょう。そして矩形に「岡田」と書いた画像を貼れば最もシンプルに岡田を物理エンジンの世界に登場させることが可能です。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F02a724bb-e544-2e5f-5dfe-ffabf09390a3.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=6be78834e89aca1135594b10d693f0f4" target="_blank" rel="nofollow noopener"><img src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F02a724bb-e544-2e5f-5dfe-ffabf09390a3.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=6be78834e89aca1135594b10d693f0f4" alt="May-05-2019 19-55-53.gif" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/02a724bb-e544-2e5f-5dfe-ffabf09390a3.gif" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F02a724bb-e544-2e5f-5dfe-ffabf09390a3.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=78853eb110fa778a23d8508d729b562e 1x" loading="lazy"></a></p>
+
+<p>成功しました、最古の岡田です。まだまだ先は長いですが、小さな成功体験の積み上げこそが大事です。</p>
+
+<p>matter.jsを使えば一瞬で終わりそうに見えますが、画像を矩形に貼り付けるために、matter.jsの描画機能は使わず自前で<code>canvas</code>に描画する処理を作っています。<br>
+とはいえ今回扱う図形は全て剛体なので、物理エンジン世界における図形の中心と回転角さえ分かれば<code>canvas</code>の変形描画機能をそのまま使うことができます。そして勿論matter.jsはそれらのプロパティを提供してくれます。</p>
+
+<div class="code-frame" data-lang="js"><div class="highlight"><pre><span class="nx">ctx</span><span class="p">.</span><span class="nx">save</span><span class="p">()</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">translate</span><span class="p">(</span><span class="nx">body</span><span class="p">.</span><span class="nx">position</span><span class="p">.</span><span class="nx">x</span><span class="p">,</span> <span class="nx">body</span><span class="p">.</span><span class="nx">position</span><span class="p">.</span><span class="nx">y</span><span class="p">)</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">rotate</span><span class="p">(</span><span class="nx">body</span><span class="p">.</span><span class="nx">angle</span><span class="p">)</span>
+<span class="o">~~</span> <span class="err">物理演算の考慮不要な描画処理</span> <span class="o">~~</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">restore</span><span class="p">()</span>
+</pre></div></div>
+
+<h3>
+<span id="両断" class="fragment"></span><a href="#%E4%B8%A1%E6%96%AD"><i class="fa fa-link"></i></a>両断</h3>
+
+<p>次は早速一刀両断していきます。ここからは物理エンジンは無関係で、座標をいじくり倒してポリゴンを直線で両断します。</p>
+
+<p>しかしこの時点ではそれほど複雑な計算は必要ありません。なぜなら登場しているポリゴンは<a href="https://ja.wikipedia.org/wiki/%E5%87%B8%E5%A4%9A%E8%A7%92%E5%BD%A2" rel="nofollow noopener" target="_blank">凸多角形</a>であることが保証されているからです。</p>
+
+<p>凸多角形であることの何が良いかというと、両断した後のポリゴンが必ず2つの凸多角形になることです。<br>
+（証明や出展は探していないですが、直感的に正しそうなのでそう信じておきます。）</p>
+
+<p>図だとこんな感じで、左が非凸多角形、右が凸多角形です。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F7851b47b-2ea5-4606-ddd7-5b264997581b.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=a3a0420cabfb7191e6b7f4e17a247af1" target="_blank" rel="nofollow noopener"><img width="348" alt="スクリーンショット 2019-05-05 20.50.50.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F7851b47b-2ea5-4606-ddd7-5b264997581b.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=a3a0420cabfb7191e6b7f4e17a247af1" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/7851b47b-2ea5-4606-ddd7-5b264997581b.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F7851b47b-2ea5-4606-ddd7-5b264997581b.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=c4ed17d7d701d6c56c84fc8e63571e67 1x" loading="lazy"></a></p>
+
+<p>断面となる頂点を2つ追加し、その断面が辺となるように他の頂点を拾い集めて2つのポリゴンを作れば両断処理の完成です。<br>
+そして新たに生まれた２つのポリゴンも凸多角形なので、両断前と後で物理エンジンの世界に存在するポリゴンの特性は何も変化していません。それっぽく言うと、凸多角形は切るという処理において完備なわけです。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fcf79cb78-7113-44a4-91ae-f8a4a6631483.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=be03f6b7a1498fb6cd4fcd696c869619" target="_blank" rel="nofollow noopener"><img width="189" alt="スクリーンショット 2019-05-05 20.59.23.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fcf79cb78-7113-44a4-91ae-f8a4a6631483.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=be03f6b7a1498fb6cd4fcd696c869619" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/cf79cb78-7113-44a4-91ae-f8a4a6631483.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fcf79cb78-7113-44a4-91ae-f8a4a6631483.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=1bacf97b052bfb91a534978fd3705a6b 1x" loading="lazy"></a></p>
+
+<p>こうして最古の岡田は無事に切ることができました。<br>
+両断後のポリゴンに若干の動きを加えたりすれば、切った感はさらに高まります。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Ffc985714-7607-bfe7-965a-5260bc21d5d2.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=def30118b56f9930bded1706a8b6b3d2" target="_blank" rel="nofollow noopener"><img src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Ffc985714-7607-bfe7-965a-5260bc21d5d2.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=def30118b56f9930bded1706a8b6b3d2" alt="May-05-2019 19-47-06.gif" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/fc985714-7607-bfe7-965a-5260bc21d5d2.gif" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Ffc985714-7607-bfe7-965a-5260bc21d5d2.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=45e3834aac14ea06d6ca46efd5f020a6 1x" loading="lazy"></a></p>
+
+<h2>
+<span id="svg時代" class="fragment"></span><a href="#svg%E6%99%82%E4%BB%A3"><i class="fa fa-link"></i></a>SVG時代</h2>
+
+<h3>
+<span id="葛藤" class="fragment"></span><a href="#%E8%91%9B%E8%97%A4"><i class="fa fa-link"></i></a>葛藤</h3>
+
+<blockquote>
+<p><strong>「それ岡田じゃなくて画像切っただけじゃない？」</strong></p>
+</blockquote>
+
+<p>わかる。</p>
+
+<p>ただ岡田と書かれた画像を貼り付けた矩形を切っただけだ、これでは岡田を切ったなんて到底言えない。<br>
+画像を切りたいんじゃないんだ、岡田を切りたいんだ。</p>
+
+<h3>
+<span id="岡田を求めて" class="fragment"></span><a href="#%E5%B2%A1%E7%94%B0%E3%82%92%E6%B1%82%E3%82%81%E3%81%A6"><i class="fa fa-link"></i></a>岡田を求めて</h3>
+
+<p>岡田を切るためには、とにかくまずは物理エンジンの世界に岡田を登場させなくてはいけません。<br>
+手段は色々あると思いますが、2Dでの表現ができ、かつ座標が扱いやすそうなSVGを入力として採用しました。</p>
+
+<p>SVGを入力に使うと決めたはいいものの、もちろんSVGのデータ表現をそのまま物理エンジンの世界に突っ込むことはできません。最終的には両断計算をする必要もあるので座標としてパースする必要があります。</p>
+
+<p>というわけでSVGの仕様を懇切丁寧にまとめてくださっていていつもお世話になっているサイトを熟読しながらパース処理を作ります。<br>
+<a href="http://defghi1977.html.xdomain.jp/tech/svgMemo/svgMemo_03.htm" class="autolink" rel="nofollow noopener" target="_blank">http://defghi1977.html.xdomain.jp/tech/svgMemo/svgMemo_03.htm</a></p>
+
+<p><code>&lt;path&gt;</code>エレメントはコマンドと座標の羅列で図形を表現するのが若干ややこしいものの、<code>M x y</code>や<code>L x y</code>などのコマンドはそのまま座標として抜き出せます。</p>
+
+<h4>
+<span id="曲線という強敵" class="fragment"></span><a href="#%E6%9B%B2%E7%B7%9A%E3%81%A8%E3%81%84%E3%81%86%E5%BC%B7%E6%95%B5"><i class="fa fa-link"></i></a>曲線という強敵</h4>
+
+<p>しかしここで、SVGを入力として使うことに潜んでいた問題に気づきます。ベジェ曲線、円弧、楕円の存在です。</p>
+
+<p><a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F04f3660f-da2b-9dff-3223-75ecd81b2964.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=e4c87d47e7eef74aab7ad175d6f3abe9" target="_blank" rel="nofollow noopener"><img width="416" alt="スクリーンショット 2019-05-05 22.33.58.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F04f3660f-da2b-9dff-3223-75ecd81b2964.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=e4c87d47e7eef74aab7ad175d6f3abe9" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/04f3660f-da2b-9dff-3223-75ecd81b2964.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F04f3660f-da2b-9dff-3223-75ecd81b2964.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=5b1cca44e4ebea0311ae719878a25602 1x" loading="lazy"></a></p>
+
+<p>物理エンジンが対応しているのだろうか、両断するときにどんな計算が必要になるのだろうかと瞬時に様々な問題が頭をよぎります。そして早々にそれは無理だと諦め、直線で近似する方針をとりました。<br>
+ただでさえ面倒な座標計算にさらに曲線も考慮に入れるなんてやり遂げられる気がしません。まともに勝負するには多角形の世界に持ち込むしかありません。</p>
+
+<p>2次ベジェは2次方程式を、3次ベジェは3次方程式を、楕円は楕円方程式を近似用の頂点を導出していきます。ここは気合で計算していくしかありません。<br>
+特に<code>&lt;path&gt;</code>エレメントにおける楕円の表現は、楕円の中心ではなく弧上の始点と終点を指定するという特殊なものだったため、楕円方程式を求めるまでにも手間がかかりました。</p>
+
+<p><a href="https://triple-underscore.github.io/SVG11/implnote.html#ArcImplementationNotes" class="autolink" rel="nofollow noopener" target="_blank">https://triple-underscore.github.io/SVG11/implnote.html#ArcImplementationNotes</a><br>
+W3Cのドキュメントからも楕円の面倒くささが伺えます。ただでさえ式が難しいのにさらに特殊ケースの分岐まで豊富でとにかく気合が求められます。岡田を切るには気合が必要なのです。</p>
+
+<p>こうして曲線の近似も乗り越え、遂にSVGからポリゴンを座標リストとしてパースすることに成功しました。<br>
+3次ベジェの近似サンプルはこんな感じです。近似に使う頂点数を増やせば違和感もかなり減っていきます。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F5571bfe0-7794-c16c-1f32-a98938df4a84.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=f242e53991f65df41f66a1d5f533c2e9" target="_blank" rel="nofollow noopener"><img width="195" alt="スクリーンショット 2019-05-05 22.39.48.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F5571bfe0-7794-c16c-1f32-a98938df4a84.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=f242e53991f65df41f66a1d5f533c2e9" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/5571bfe0-7794-c16c-1f32-a98938df4a84.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F5571bfe0-7794-c16c-1f32-a98938df4a84.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=a39a02239014e6a8e987de0d7b94458a 1x" loading="lazy"></a></p>
+
+<h3>
+<span id="非凸多角形の両断" class="fragment"></span><a href="#%E9%9D%9E%E5%87%B8%E5%A4%9A%E8%A7%92%E5%BD%A2%E3%81%AE%E4%B8%A1%E6%96%AD"><i class="fa fa-link"></i></a>非凸多角形の両断</h3>
+
+<p>SVGパースという頭の体操を乗り越え、ついに岡田を物理エンジンの世界に登場させることができました。なんと岡田にはベジェも楕円も必要なかったという事実から目をそらすために、飾り付けも入念に行います。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Ff3898b3d-0826-ce41-ac7d-45d3eb5bc8be.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=22b583a23d97df7d1b64a717e02ec5a9" target="_blank" rel="nofollow noopener"><img width="356" alt="スクリーンショット 2019-05-05 23.16.09.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Ff3898b3d-0826-ce41-ac7d-45d3eb5bc8be.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=22b583a23d97df7d1b64a717e02ec5a9" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/f3898b3d-0826-ce41-ac7d-45d3eb5bc8be.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Ff3898b3d-0826-ce41-ac7d-45d3eb5bc8be.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=4412b91d24af778b5c1afebfb8c3fc3d 1x" loading="lazy"></a></p>
+
+<p>上の画像を見れば明らかなように、非凸な多角形が世界に溢れ出します。かつて凸多角形の完備性に頼って実装した両断処理にも調整が必要となってくるわけです。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fe4d113c5-7e24-f64a-7db4-a20eee650cf5.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=2d821c79f884cafe3e54818d5b407175" target="_blank" rel="nofollow noopener"><img width="167" alt="スクリーンショット 2019-05-05 23.20.39.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fe4d113c5-7e24-f64a-7db4-a20eee650cf5.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=2d821c79f884cafe3e54818d5b407175" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/e4d113c5-7e24-f64a-7db4-a20eee650cf5.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fe4d113c5-7e24-f64a-7db4-a20eee650cf5.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=541d3a05ccfd1ad1d4fab0f1335b266d 1x" loading="lazy"></a></p>
+
+<p>と思わせぶりに書いたものの、実は違いは分割後のポリゴン数が3以上の場合もあり得るというだけです。<br>
+一気に分割しようとするとなかなかややこしいですが、やることは2つのポリゴンへの分割を繰り返すだけです。</p>
+
+<p>手順はこうです。</p>
+
+<ol>
+<li>直線とポリゴンの各辺との交点を求め、直線の方向順に並べる</li>
+<li>並べた交点のうち先頭2点だけを分断面として採用してポリゴンを2つに分割する</li>
+<li>分割したポリゴンそれぞれで１からの処理を繰り返す（分割されなくなったら終わり）</li>
+<li>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fe0a61af6-cb8c-a895-39d6-e04e3fbce922.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=ecae545169f8a6249373b02caf3c76e9" target="_blank" rel="nofollow noopener"><img width="170" alt="スクリーンショット 2019-05-06 0.00.37.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fe0a61af6-cb8c-a895-39d6-e04e3fbce922.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=ecae545169f8a6249373b02caf3c76e9" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/e0a61af6-cb8c-a895-39d6-e04e3fbce922.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fe0a61af6-cb8c-a895-39d6-e04e3fbce922.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=845ad908046defb4bc6c674dc4351c77 1x" loading="lazy"></a>
+</li>
+</ol>
+
+<p>1で並び替えるときは、直線がx軸と重なるような回転を交点にかけるとx座標の比較だけで済んで楽です。雰囲気は下記のような感じ。</p>
+
+<div class="code-frame" data-lang="js"><div class="highlight"><pre><span class="kd">const</span> <span class="nx">rad</span> <span class="o">=</span> <span class="nx">getRadian</span><span class="p">(</span><span class="nx">line</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">line</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="nx">crossList</span><span class="p">.</span><span class="nx">sort</span><span class="p">((</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">rotate</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="o">-</span><span class="nx">rad</span><span class="p">).</span><span class="nx">x</span> <span class="o">-</span> <span class="nx">rotate</span><span class="p">(</span><span class="nx">b</span><span class="p">,</span> <span class="o">-</span><span class="nx">rad</span><span class="p">).</span><span class="nx">x</span><span class="p">)</span>
+</pre></div></div>
+
+<h3>
+<span id="非凸多角形を凸多角形に分解する余談" class="fragment"></span><a href="#%E9%9D%9E%E5%87%B8%E5%A4%9A%E8%A7%92%E5%BD%A2%E3%82%92%E5%87%B8%E5%A4%9A%E8%A7%92%E5%BD%A2%E3%81%AB%E5%88%86%E8%A7%A3%E3%81%99%E3%82%8B%E4%BD%99%E8%AB%87"><i class="fa fa-link"></i></a>非凸多角形を凸多角形に分解する余談</h3>
+
+<p>実はこれを作った当初（2016年頃？）は、matter.jsが非凸な多角形に対応していませんでした。なのでSVGからパースした多角形を三角分割し、分割された三角形をグループ化することで無理やり物理エンジンに食わせていたりしました。</p>
+
+<p>しかし現在のmatter.jsは<a href="https://github.com/schteppe/poly-decomp.js/" rel="nofollow noopener" target="_blank">poly-decomp.js</a>という外部モジュールと一緒に使うことで非凸な多角形でも問題なく扱えるようになっています。<br>
+結局やっていることは同じく凸多角形への分割とグループ化なのですが、凸多角形の最小単位である三角形ではなく、パーツ数が少なくなるよう最適化された分割をしてくれます。</p>
+
+<p>すごい。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fcloud.githubusercontent.com%2Fassets%2F1063152%2F18008563%2Fedccfe86-6ba8-11e6-9e20-a090c1812c95.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=4d38ba3845fa6152ed8a00e04c12945e" target="_blank" rel="nofollow noopener"><img src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fcloud.githubusercontent.com%2Fassets%2F1063152%2F18008563%2Fedccfe86-6ba8-11e6-9e20-a090c1812c95.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=4d38ba3845fa6152ed8a00e04c12945e" alt="poly-decomp.js" title="poly-decomp.jsのデモ" data-canonical-src="https://cloud.githubusercontent.com/assets/1063152/18008563/edccfe86-6ba8-11e6-9e20-a090c1812c95.gif" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fcloud.githubusercontent.com%2Fassets%2F1063152%2F18008563%2Fedccfe86-6ba8-11e6-9e20-a090c1812c95.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=b6ef03aa1bf52eb185e85f6287e97a6b 1x" loading="lazy"></a></p>
+
+<p>matter.jsの進化を喜ぶ共に、いらなくなってしまったかつての処理をここで供養しておきます。</p>
+
+<p><a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F6c108697-49c9-8b70-e682-d4a4e4c09e0b.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=e215ce44d58402b510814986bd290a11" target="_blank" rel="nofollow noopener"><img width="292" alt="スクリーンショット 2019-05-06 0.14.58.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F6c108697-49c9-8b70-e682-d4a4e4c09e0b.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=e215ce44d58402b510814986bd290a11" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/6c108697-49c9-8b70-e682-d4a4e4c09e0b.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F6c108697-49c9-8b70-e682-d4a4e4c09e0b.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=3b3dca90df5dabd6c5f72dffebf98e06 1x" loading="lazy"></a><br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fcd90719b-5315-a020-b1a4-68d83a3f2370.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=5210faa9c685f2a52cca1a4573c0a7c7" target="_blank" rel="nofollow noopener"><img width="180" alt="スクリーンショット 2019-05-06 0.19.41.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fcd90719b-5315-a020-b1a4-68d83a3f2370.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=5210faa9c685f2a52cca1a4573c0a7c7" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/cd90719b-5315-a020-b1a4-68d83a3f2370.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fcd90719b-5315-a020-b1a4-68d83a3f2370.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=5f7c44ef6fa7215b36a1e0833af54612 1x" loading="lazy"></a></p>
+
+<h3>
+<span id="欲しかったのはバッサリ感" class="fragment"></span><a href="#%E6%AC%B2%E3%81%97%E3%81%8B%E3%81%A3%E3%81%9F%E3%81%AE%E3%81%AF%E3%83%90%E3%83%83%E3%82%B5%E3%83%AA%E6%84%9F"><i class="fa fa-link"></i></a>欲しかったのはバッサリ感</h3>
+
+<p>準備は整いました。いきましょう、バッサリと。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F586fa3e9-78b1-2912-bddc-a53dd955196a.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=8a3a2891f138f2c1e2dd69bda8c8b28a" target="_blank" rel="nofollow noopener"><img src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F586fa3e9-78b1-2912-bddc-a53dd955196a.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=8a3a2891f138f2c1e2dd69bda8c8b28a" alt="May-05-2019 23-10-19.gif" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/586fa3e9-78b1-2912-bddc-a53dd955196a.gif" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F586fa3e9-78b1-2912-bddc-a53dd955196a.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=694e20d4309792e815cf42941669efbc 1x" loading="lazy"></a></p>
+
+<h2>
+<span id="フォント時代" class="fragment"></span><a href="#%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88%E6%99%82%E4%BB%A3"><i class="fa fa-link"></i></a>フォント時代</h2>
+
+<h3>
+<span id="葛藤と妥協" class="fragment"></span><a href="#%E8%91%9B%E8%97%A4%E3%81%A8%E5%A6%A5%E5%8D%94"><i class="fa fa-link"></i></a>葛藤と妥協</h3>
+
+<blockquote>
+<p><strong>「それ岡田っぽい形をした図形を切っただけじゃない？」</strong></p>
+</blockquote>
+
+<p>わかる。</p>
+
+<p>見て見ぬふりをしていましたが、SVGから作り出した岡田っぽい図形には多くの制限事項がありました。</p>
+
+<p>「岡」はまぁ許せなくはないです。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F7a047cd6-69e1-867c-c4ee-e1ed375fa3ec.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=fe4f76be7c6c7e0342501e5730408bfe" target="_blank" rel="nofollow noopener"><img width="69" alt="スクリーンショット 2019-05-05 23.14.21.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F7a047cd6-69e1-867c-c4ee-e1ed375fa3ec.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=fe4f76be7c6c7e0342501e5730408bfe" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/7a047cd6-69e1-867c-c4ee-e1ed375fa3ec.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F7a047cd6-69e1-867c-c4ee-e1ed375fa3ec.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=90cf59c619be79582a9934f8ea2a6726 1x" loading="lazy"></a></p>
+
+<p>しかし「田」には大きな誤魔化しがあります。不自然な隙間が所々に存在しています。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fbd36dc8d-74c0-7003-5447-5b0ebe706693.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=fe66764e5b0f31936c43c8903c3e1fbc" target="_blank" rel="nofollow noopener"><img width="80" alt="スクリーンショット 2019-05-06 0.33.36.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fbd36dc8d-74c0-7003-5447-5b0ebe706693.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=fe66764e5b0f31936c43c8903c3e1fbc" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/bd36dc8d-74c0-7003-5447-5b0ebe706693.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fbd36dc8d-74c0-7003-5447-5b0ebe706693.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=dbd9fe4c47d8efe8d74ddf0349decb7b 1x" loading="lazy"></a></p>
+
+<p>隙間が気になるなら無くせばいいと思われるかもしれませんが、この隙間には大きな意味がありました。もしこの隙間をなくし、「田」という字そのままを表現しようとすると、ポリゴンに穴が空いてしまうのです。</p>
+
+<p><a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fa3c000fd-7e23-8b04-aba5-ba080eaea4c9.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=c2b4979daa29019d58e870737b67a89b" target="_blank" rel="nofollow noopener"><img width="85" alt="スクリーンショット 2019-05-06 0.42.48.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fa3c000fd-7e23-8b04-aba5-ba080eaea4c9.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=c2b4979daa29019d58e870737b67a89b" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/a3c000fd-7e23-8b04-aba5-ba080eaea4c9.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fa3c000fd-7e23-8b04-aba5-ba080eaea4c9.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=4dcc374bf59cde0fba101d332a7049c8 1x" loading="lazy"></a></p>
+
+<p>物理エンジンが対応しているのだろうか、両断するときにどんな計算が必要になるのだろうかと瞬時に様々な問題が頭をよぎる以前に、そもそもデータ構造として今のままでは穴空きポリゴンを表現することはできません。<br>
+岡田っぽい図形が切れて満足してしまったこともあり、この難題に再び立ち向かうまでにはさらに３年ほどの年月を待つこととなりました。</p>
+
+<h3>
+<span id="転機" class="fragment"></span><a href="#%E8%BB%A2%E6%A9%9F"><i class="fa fa-link"></i></a>転機</h3>
+
+<p>月日は流れ、岡田を切ることへの情熱も忘れ去っていたある日、<a href="http://hashrock.hatenablog.com/entry/2019/05/04/001830" rel="nofollow noopener" target="_blank">複雑GUI会</a>という名前の通りディープな集会に参加する機会に恵まれました。<br>
+そしてその場で、opentype.jsというライブラリの存在を知りました。<br>
+<a href="https://github.com/opentypejs/opentype.js/blob/master/README.md" class="autolink" rel="nofollow noopener" target="_blank">https://github.com/opentypejs/opentype.js/blob/master/README.md</a></p>
+
+<p><a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fcamo.githubusercontent.com%2F2eae816a7d7ec3155c6136a50cc7a939eee608ca%2F68747470733a2f2f7261772e6769746875622e636f6d2f6f70656e747970656a732f6f70656e747970652e6a732f6d61737465722f672f68656c6c6f2d776f726c642e706e67?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=f2b9a34668e2431de8e1460e2149948d" target="_blank" rel="nofollow noopener"><img src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fcamo.githubusercontent.com%2F2eae816a7d7ec3155c6136a50cc7a939eee608ca%2F68747470733a2f2f7261772e6769746875622e636f6d2f6f70656e747970656a732f6f70656e747970652e6a732f6d61737465722f672f68656c6c6f2d776f726c642e706e67?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=f2b9a34668e2431de8e1460e2149948d" alt="" title="opentype.jsのデモ画像" data-canonical-src="https://camo.githubusercontent.com/2eae816a7d7ec3155c6136a50cc7a939eee608ca/68747470733a2f2f7261772e6769746875622e636f6d2f6f70656e747970656a732f6f70656e747970652e6a732f6d61737465722f672f68656c6c6f2d776f726c642e706e67" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fcamo.githubusercontent.com%2F2eae816a7d7ec3155c6136a50cc7a939eee608ca%2F68747470733a2f2f7261772e6769746875622e636f6d2f6f70656e747970656a732f6f70656e747970652e6a732f6d61737465722f672f68656c6c6f2d776f726c642e706e67?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=3e1e13b3bd6cfc9d88fcf6fbf8670617 1x" loading="lazy"></a></p>
+
+<p>注目の機能は、上の画像のようにフォントからパスを取得することができる機能です。<br>
+特に理由はありませんが岡田のパスを取得すべく早速試してみます。</p>
+
+<p>とりあえずREADME通りに使ってみてパスがどんな形式になっているのか調べてみます。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fe6802636-1e37-294e-a7f0-d7f863873a97.jpeg?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=ed5eddbc70db90f5b68dfb56d26a3add" target="_blank" rel="nofollow noopener"><img src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fe6802636-1e37-294e-a7f0-d7f863873a97.jpeg?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=ed5eddbc70db90f5b68dfb56d26a3add" alt="D5jxlN6WsAAJR5M.jpg" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/e6802636-1e37-294e-a7f0-d7f863873a97.jpeg" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fe6802636-1e37-294e-a7f0-d7f863873a97.jpeg?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=4fbd3eb133f9a2b3cea854b43f63d7bb 1x" loading="lazy"></a></p>
+
+<p>一部界隈の方ならこの画像だけでどんなデータフォーマットなのか一目瞭然でしょう。そうです、これはSVGの<code>&lt;path&gt;</code>エレメントにおける<code>d</code>属性フォーマットに違いありません。</p>
+
+<p>まるで運命だったかのように、SVGから座標をパースする処理はすでに手元にあります。<br>
+しかもこの半年ほど前に、typescriptの素振りをしようとパース処理をリプレイスし、かつては無かったテストまでも大幅に充実させていました。</p>
+
+<p>若干のインタフェース調整は必要でしたが、それほど苦もなく岡田のフォントパースに成功します。</p>
+
+<h3>
+<span id="穴あきポリゴンの正体" class="fragment"></span><a href="#%E7%A9%B4%E3%81%82%E3%81%8D%E3%83%9D%E3%83%AA%E3%82%B4%E3%83%B3%E3%81%AE%E6%AD%A3%E4%BD%93"><i class="fa fa-link"></i></a>穴あきポリゴンの正体</h3>
+
+<p>岡田フォントのパースに成功すると共にあることに気づきました。フォントのパスデータにはポリゴンがフラットな配列で存在するのみなのにも関わらず、opentype.jsは穴の空いたポリゴンもしっかりと描画しています。</p>
+
+<p>穴あきポリゴンを表現するには特別なデータ構造を用意しなければいけないと思い込んでいた身からすると、これは大きな衝撃でした。<br>
+もしかしてSVGには白抜き描画用のコマンドも用意されているのではと調べていたら、<a href="http://defghi1977.html.xdomain.jp/tech/svgMemo/svgMemo_03.htm" rel="nofollow noopener" target="_blank">SVGの教科書</a>としていつも大活用させてもらっているサイトにてその答えを見つけました。</p>
+
+<blockquote class="twitter-tweet">
+<p>&gt; path要素においてはfill-ruleがnonzeroであっても，白抜きとなるケースが発生する．複数のパスから構成されたpash図形であった場合，互いにパスの向きが逆向きであった場合は，内側と外側とが打ち消し合い，fill対象の領域から除外される．<a href="https://t.co/0abg9y1qWA" rel="nofollow noopener" target="_blank">https://t.co/0abg9y1qWA</a></p>— robokomy (@robokomy) <a href="https://twitter.com/robokomy/status/1123965892382138369?ref_src=twsrc%5Etfw" rel="nofollow noopener" target="_blank">2019年5月2日</a>
+</blockquote>
+
+<script async src="https://platform.twitter.com/widgets.js"></script>
+
+<p>つまり、ポリゴンにはパスの向きという概念が存在し、逆向きなポリゴンを内包している場合、その内容ポリゴン部分は白抜きされます。この仕様によって、特別なデータ構造を用意しなくとも穴の空いたポリゴンを表現することが可能となっています。</p>
+
+<h3>
+<span id="穴空きポリゴンの描画" class="fragment"></span><a href="#%E7%A9%B4%E7%A9%BA%E3%81%8D%E3%83%9D%E3%83%AA%E3%82%B4%E3%83%B3%E3%81%AE%E6%8F%8F%E7%94%BB"><i class="fa fa-link"></i></a>穴空きポリゴンの描画</h3>
+
+<p>SVGの仕様から発覚した穴空きポリゴンの表現ですが、これはcanvasでも同様です。<br>
+描画方法は既にこちらで記事化しています。<br>
+<a href="https://qiita.com/miyanokomiya/items/c0e9f2ea8d05945d58b3" class="autolink" id="reference-0220928e1a98adc2f3a3">https://qiita.com/miyanokomiya/items/c0e9f2ea8d05945d58b3</a></p>
+
+<h3>
+<span id="物理エンジン世界での穴あきポリゴン" class="fragment"></span><a href="#%E7%89%A9%E7%90%86%E3%82%A8%E3%83%B3%E3%82%B8%E3%83%B3%E4%B8%96%E7%95%8C%E3%81%A7%E3%81%AE%E7%A9%B4%E3%81%82%E3%81%8D%E3%83%9D%E3%83%AA%E3%82%B4%E3%83%B3"><i class="fa fa-link"></i></a>物理エンジン世界での穴あきポリゴン</h3>
+
+<p>描画方法は分かりましたが、物理エンジン世界で穴あきポリゴンをどう扱うか考える必要があります。<br>
+アイディアはいくつかありそうですが、実装がシンプルそうなので外枠以外は模様として扱うことにしました。</p>
+
+<p>例えばこのような図形があった場合、物理エンジン世界での実態はただの矩形です。そして内部の穴あき矩形はただの模様であり、外枠から独立した物理計算をされることはありません。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F079c9c58-eb12-e11a-b5b4-7012f3669ca9.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=2513abd2553c81a62006c79947fdeeba" target="_blank" rel="nofollow noopener"><img width="175" alt="スクリーンショット 2019-05-06 1.41.50.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F079c9c58-eb12-e11a-b5b4-7012f3669ca9.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=2513abd2553c81a62006c79947fdeeba" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/079c9c58-eb12-e11a-b5b4-7012f3669ca9.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F079c9c58-eb12-e11a-b5b4-7012f3669ca9.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=4f32d6abaff3eae0ad5779fb40482147 1x" loading="lazy"></a></p>
+
+<h3>
+<span id="ポリゴンの包含判定" class="fragment"></span><a href="#%E3%83%9D%E3%83%AA%E3%82%B4%E3%83%B3%E3%81%AE%E5%8C%85%E5%90%AB%E5%88%A4%E5%AE%9A"><i class="fa fa-link"></i></a>ポリゴンの包含判定</h3>
+
+<p>この模様方針を実現するために面倒だったのは、物理エンジンに入れ込む外枠ポリゴンと、その内部模様となるポリゴンをグルーピングする必要があることです。<br>
+一般的にある面が他の面に含まれているかを判定するのは様々なケースが考えられてとても面倒です。</p>
+
+<p>シンプルなケースは下図左のようなものです。この場合、全ての頂点があるポリゴンに含まれているならば、その頂点から構成されるポリゴンも包含されているとみなすことができます。</p>
+
+<p><a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fcbdba840-0688-c1a5-093e-78978ed046d8.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=a20ddffd99e3e83ce259607d970d1e2a" target="_blank" rel="nofollow noopener"><img width="224" alt="スクリーンショット 2019-05-06 10.26.46.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fcbdba840-0688-c1a5-093e-78978ed046d8.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=a20ddffd99e3e83ce259607d970d1e2a" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/cbdba840-0688-c1a5-093e-78978ed046d8.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fcbdba840-0688-c1a5-093e-78978ed046d8.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=d3564e1873ffdfe4c99d71bf9a15474e 1x" loading="lazy"></a></p>
+
+<p>しかし右のケースでは早くもその判定が破綻します。同じく全ての頂点が他のポリゴンに含まれているのに、明らかにはみ出している部分が存在しています。<br>
+辺の交差判定も加えたらいけるかもしれません。それでは下図左のように、凹のくぼみにぴったり嵌まり込んでいるようなケースはどうでしょうか。</p>
+
+<p><a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fef760d75-4824-ceb9-3ef0-44fda34bbcc9.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=9da54b28872945eba8a12bb9f02aac6b" target="_blank" rel="nofollow noopener"><img width="311" alt="スクリーンショット 2019-05-06 10.54.25.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fef760d75-4824-ceb9-3ef0-44fda34bbcc9.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=9da54b28872945eba8a12bb9f02aac6b" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/ef760d75-4824-ceb9-3ef0-44fda34bbcc9.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fef760d75-4824-ceb9-3ef0-44fda34bbcc9.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=f112d96565809f4ce1de7748ee17480e 1x" loading="lazy"></a></p>
+
+<p>頂点は全て大きいポリゴンの辺上にあり、辺同士での交差もしていません。しかし内包関係にないことは目で見れば明らかです。<br>
+中心点がポリゴンに含まれているかの判定も加えたらいけるかもしれません。しかし右のケースから分かるように、中心点が含まれるかどうかはポリゴンの形次第でとても頼りにはできません。</p>
+
+<p>このように一般的なポリゴンの包含判定はとても面倒です。やっぱり手に負えないと投げ出したくもなりましたが、幸運なことにとある抜け道を見つけることができました。<br>
+その抜け道とは、<strong>今回扱っているポリゴンがフォント由来のもの</strong>であることでした。</p>
+
+<p><a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F8fea6861-97ae-6ad0-7cce-a64f4255ad9c.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=575614370fdccefdb5508780120663ea" target="_blank" rel="nofollow noopener"><img width="109" alt="スクリーンショット 2019-05-06 11.04.49.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F8fea6861-97ae-6ad0-7cce-a64f4255ad9c.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=575614370fdccefdb5508780120663ea" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/8fea6861-97ae-6ad0-7cce-a64f4255ad9c.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F8fea6861-97ae-6ad0-7cce-a64f4255ad9c.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=5f519b203a34dc4a2efa156fac72f55b 1x" loading="lazy"></a></p>
+
+<p>要するに、包含関係は最もシンプルな上記のパターンしかないはずなのです。これも証明などは無く直感的に正しそうだという程度のものですが、先に挙げた面倒なケースのどれも、フォントとしての表現で使われることはないはずです。<br>
+このことを前提とするならば、ポリゴンの包含判定は、頂点全てが他のポリゴンに含まれているかを判定するだけで十分となります。</p>
+
+<h4>
+<span id="点の包含判定" class="fragment"></span><a href="#%E7%82%B9%E3%81%AE%E5%8C%85%E5%90%AB%E5%88%A4%E5%AE%9A"><i class="fa fa-link"></i></a>点の包含判定</h4>
+
+<p>ある点がポリゴンに包含されているかは、その点から任意の方向に伸ばしたベクトルがポリゴンの辺と何回交差するかを数えることで判定可能です。奇数回なら内部、偶数回なら外部とみなします。<br>
+Crossing Number Algorithmと呼ぶそうです。<br>
+<a href="https://www.nttpc.co.jp/technology/number_algorithm.html" class="autolink" rel="nofollow noopener" target="_blank">https://www.nttpc.co.jp/technology/number_algorithm.html</a></p>
+
+<p><a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F688b4e62-9ac9-1ec7-e073-86ab63456604.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=a8ad3ed487cfe8c34b34fa6a5effe38c" target="_blank" rel="nofollow noopener"><img width="205" alt="スクリーンショット 2019-05-06 11.28.52.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F688b4e62-9ac9-1ec7-e073-86ab63456604.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=a8ad3ed487cfe8c34b34fa6a5effe38c" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/688b4e62-9ac9-1ec7-e073-86ab63456604.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F688b4e62-9ac9-1ec7-e073-86ab63456604.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=40d724c148ea4250885d5f82f6f0a139 1x" loading="lazy"></a></p>
+
+<p>この手法についてはweb上にも多くの資料があるので紹介程度に留めておきます。頭の体操兼素振りと思って手を動かしてみるのも楽しいと思います。</p>
+
+<h4>
+<span id="グルーピング" class="fragment"></span><a href="#%E3%82%B0%E3%83%AB%E3%83%BC%E3%83%94%E3%83%B3%E3%82%B0"><i class="fa fa-link"></i></a>グルーピング</h4>
+
+<p>判定の準備は整ったので、あとは外枠用ポリゴンと模様用ポリゴンをグルーピングしていくだけです。複数グループに所属するというケースはないので、意外と単純にグルーピングが可能です。</p>
+
+<p>具体的な手順はこのような感じになりました。</p>
+
+<ol>
+<li>ポリゴンを面積の大きい順にソート</li>
+<li>面積最大のポリゴンから順に、その内部に他のポリゴンを含むか判定</li>
+<li>含むなら同じグループとして確定、含まないならグループ未確定として保留</li>
+<li>面積最小のポリゴンまでループを回せば全てのグループが確定する</li>
+</ol>
+
+<h3>
+<span id="フォント-to-物理エンジン世界" class="fragment"></span><a href="#%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88-to-%E7%89%A9%E7%90%86%E3%82%A8%E3%83%B3%E3%82%B8%E3%83%B3%E4%B8%96%E7%95%8C"><i class="fa fa-link"></i></a>フォント to 物理エンジン世界</h3>
+
+<p>こうしてまずは、フォントからパースした岡田を物理エンジン世界に登場させることに成功しました。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F6d5f7e1c-a21c-62ac-4df3-18fd259dc274.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=f245e23feab82dc6322647aa0de276e5" target="_blank" rel="nofollow noopener"><img width="268" alt="スクリーンショット 2019-05-06 1.35.07.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F6d5f7e1c-a21c-62ac-4df3-18fd259dc274.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=f245e23feab82dc6322647aa0de276e5" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/6d5f7e1c-a21c-62ac-4df3-18fd259dc274.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F6d5f7e1c-a21c-62ac-4df3-18fd259dc274.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=fd132018b6fc40436f5937ea60865433 1x" loading="lazy"></a></p>
+
+<h3>
+<span id="穴あきポリゴンの両断" class="fragment"></span><a href="#%E7%A9%B4%E3%81%82%E3%81%8D%E3%83%9D%E3%83%AA%E3%82%B4%E3%83%B3%E3%81%AE%E4%B8%A1%E6%96%AD"><i class="fa fa-link"></i></a>穴あきポリゴンの両断</h3>
+
+<p>最後の砦です。岡田を切るには、穴あきポリゴンを両断する処理を作らなければなりません。</p>
+
+<p>まずはやるべきことを整理します。<br>
+このような穴あきポリゴンを両断したら、<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Faa3a01f7-e09f-813c-2f44-67e12f6cff41.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=750ae1582a897d17f386e0e07d906da8" target="_blank" rel="nofollow noopener"><img width="131" alt="スクリーンショット 2019-05-06 11.59.27.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Faa3a01f7-e09f-813c-2f44-67e12f6cff41.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=750ae1582a897d17f386e0e07d906da8" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/aa3a01f7-e09f-813c-2f44-67e12f6cff41.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Faa3a01f7-e09f-813c-2f44-67e12f6cff41.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=f7bb4d8fab7d51b7853495cf74274dc7 1x" loading="lazy"></a></p>
+
+<p>こういうポリゴンの破片が欲しいわけです（もう一方の破片は一旦無視しておきます）。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fa9369dd7-cd38-e7e5-f8d4-147c17ce628d.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=fa62511b7be2a8c3085a680eca192925" target="_blank" rel="nofollow noopener"><img width="81" alt="スクリーンショット 2019-05-06 11.59.31.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fa9369dd7-cd38-e7e5-f8d4-147c17ce628d.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=fa62511b7be2a8c3085a680eca192925" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/a9369dd7-cd38-e7e5-f8d4-147c17ce628d.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Fa9369dd7-cd38-e7e5-f8d4-147c17ce628d.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=39bbd6f534fab352e3245dd1352c2025 1x" loading="lazy"></a></p>
+
+<p>ここで注目したいのは、穴としての役割を担っていたポリゴンが両断対象になった場合、その穴は消滅して窪みになるということです。<br>
+やるべきことが段々と見えてきました。</p>
+
+<p>下図を使ってさらに整理します。</p>
+
+<ul>
+<li>下向きの矢印: 両断線</li>
+<li>左側の図: 外枠ポリゴンを両断した後のポリゴン</li>
+<li>中央の図: 両断線がヒットした元々の穴用ポリゴン</li>
+<li>右側の図: 穴開きポリゴンを両断した後に欲しいポリゴン</li>
+</ul>
+
+<p><a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Facecc970-3556-d61e-ad80-6ad4c456b4d0.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=1bf7d2ede46815b5885f94147c2f0fd1" target="_blank" rel="nofollow noopener"><img width="283" alt="スクリーンショット 2019-05-06 12.08.55.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Facecc970-3556-d61e-ad80-6ad4c456b4d0.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=1bf7d2ede46815b5885f94147c2f0fd1" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/acecc970-3556-d61e-ad80-6ad4c456b4d0.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Facecc970-3556-d61e-ad80-6ad4c456b4d0.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=b8b030e7c3bfc4009b6c1fae1a6aa53f 1x" loading="lazy"></a></p>
+
+<p>もうお分かりのように、「両断後の外枠ポリゴン」から「両断線がヒットした穴用ポリゴン」を差し引くことで「両断後のポリゴン」が手に入るということです。所謂ポリゴンの<a href="https://ja.wikipedia.org/wiki/%E3%83%96%E3%83%BC%E3%83%AA%E3%82%A2%E3%83%B3%E6%BC%94%E7%AE%97" rel="nofollow noopener" target="_blank">ブーリアン演算</a>です。</p>
+
+<h4>
+<span id="ブーリアン演算" class="fragment"></span><a href="#%E3%83%96%E3%83%BC%E3%83%AA%E3%82%A2%E3%83%B3%E6%BC%94%E7%AE%97"><i class="fa fa-link"></i></a>ブーリアン演算</h4>
+
+<p>今回やりたい演算はこれです。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F489d241a-4302-ac27-e23f-f0d8298f2636.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=19f0c887af0a041dfbd55eac60f1b43e" target="_blank" rel="nofollow noopener"><img width="206" alt="スクリーンショット 2019-05-06 12.29.00.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F489d241a-4302-ac27-e23f-f0d8298f2636.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=19f0c887af0a041dfbd55eac60f1b43e" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/489d241a-4302-ac27-e23f-f0d8298f2636.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F489d241a-4302-ac27-e23f-f0d8298f2636.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=244c03ca92df45fbef9ca76b70fa0a56 1x" loading="lazy"></a></p>
+
+<blockquote>
+<p><a href="https://upload.wikimedia.org/wikipedia/commons/1/16/Boolean_operations_on_shapes.png" class="autolink" rel="nofollow noopener" target="_blank">https://upload.wikimedia.org/wikipedia/commons/1/16/Boolean_operations_on_shapes.png</a></p>
+</blockquote>
+
+<p>例によって一般的なポリゴンに対するブーリアン演算を実装するのはとても面倒で心が折れそうになるのですが、今回はある程度状況が限定されています。</p>
+
+<p>ブーリアン判定を行うことになる２つのポリゴンは先述の通り、「両断後の外枠ポリゴン」と「両断線がヒットした穴用ポリゴン」という組み合わせのみです。つまり多少の形の違いはあれど、下記のようにシンプルな状況のみを考えれば十分となります。</p>
+
+<p><a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F1e17c361-f98a-4dd9-6907-019adaa55212.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=ff96859bf04239f781ffcd4ac4b84a65" target="_blank" rel="nofollow noopener"><img width="126" alt="スクリーンショット 2019-05-06 14.03.11.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F1e17c361-f98a-4dd9-6907-019adaa55212.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=ff96859bf04239f781ffcd4ac4b84a65" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/1e17c361-f98a-4dd9-6907-019adaa55212.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F1e17c361-f98a-4dd9-6907-019adaa55212.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=f158fc246a8c96a86349548b849c675e 1x" loading="lazy"></a></p>
+
+<p>さらに外枠ポリゴンと穴用ポリゴンという特性から、両者の回転方向は逆向きであることも保証されています。<br>
+両断後の外枠ポリゴンの辺で穴用ポリゴンの辺と交差しうるものは、両断線によって作られた辺だけであることにも注目です。</p>
+
+<p>ここまで条件が揃えばあとは地道に頂点を拾い集めるだけです。</p>
+
+<ol>
+<li>両断後の外枠ポリゴンの頂点をインデックス順に拾っていく</li>
+<li>両断線による辺の始点に辿り着いたら、交点を経由して穴用ポリゴンに移る</li>
+<li>穴用ポリゴンの頂点をインデックス順に拾っていく</li>
+<li>両断線による辺と交差する辺の始点に辿り着いたら、交点を経由して両断後の外枠ポリゴンに移る</li>
+<li>両断後の外枠ポリゴンの残りの頂点を全て拾い集めて完了</li>
+</ol>
+
+<h3>
+<span id="両断されなかった穴" class="fragment"></span><a href="#%E4%B8%A1%E6%96%AD%E3%81%95%E3%82%8C%E3%81%AA%E3%81%8B%E3%81%A3%E3%81%9F%E7%A9%B4"><i class="fa fa-link"></i></a>両断されなかった穴</h3>
+
+<p>先程後回しにしておいたもう片方の破片についても考えます。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Faa3a01f7-e09f-813c-2f44-67e12f6cff41.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=750ae1582a897d17f386e0e07d906da8" target="_blank" rel="nofollow noopener"><img width="131" alt="スクリーンショット 2019-05-06 11.59.27.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Faa3a01f7-e09f-813c-2f44-67e12f6cff41.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=750ae1582a897d17f386e0e07d906da8" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/aa3a01f7-e09f-813c-2f44-67e12f6cff41.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2Faa3a01f7-e09f-813c-2f44-67e12f6cff41.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=f7bb4d8fab7d51b7853495cf74274dc7 1x" loading="lazy"></a></p>
+
+<p>両断される穴部分の扱いはすでに解決しました。<br>
+残りの両断されなかった穴の扱いですが、両断処理の際は何もする必要はありません。そして両断後のポリゴンが出揃ったタイミングで、外枠用ポリゴンと模様用ポリゴンのグルーピング処理を再適用すれば、両断後の外枠ポリゴンの模様としてあり続けることに成功します。</p>
+
+<h3>
+<span id="ありがとう岡田" class="fragment"></span><a href="#%E3%81%82%E3%82%8A%E3%81%8C%E3%81%A8%E3%81%86%E5%B2%A1%E7%94%B0"><i class="fa fa-link"></i></a>ありがとう、岡田</h3>
+
+<p>こうして、数年に渡った岡田を切るための全ての準備は整いました。様々な困難がありましたが、全てはここへと繋がる道だったのだと考えると感慨深いものがあります。</p>
+
+<p>ここまでの道のり全てに感謝を込めて、バッサリいきます。<br>
+さらば、岡田。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F3660685f-4ecf-65f3-f431-61bd1631f56e.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=7acf9b8c802e16f9f35bd665740f61ce" target="_blank" rel="nofollow noopener"><img src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F3660685f-4ecf-65f3-f431-61bd1631f56e.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=7acf9b8c802e16f9f35bd665740f61ce" alt="May-05-2019 16-46-35.gif" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/3660685f-4ecf-65f3-f431-61bd1631f56e.gif" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F172228%2F3660685f-4ecf-65f3-f431-61bd1631f56e.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=cd4b60ceb7dd3df90aaea5f5614b3601 1x" loading="lazy"></a></p>
+
+<h2>
+<span id="付録" class="fragment"></span><a href="#%E4%BB%98%E9%8C%B2"><i class="fa fa-link"></i></a>付録</h2>
+
+<h3>
+<span id="計算系リポジトリ" class="fragment"></span><a href="#%E8%A8%88%E7%AE%97%E7%B3%BB%E3%83%AA%E3%83%9D%E3%82%B8%E3%83%88%E3%83%AA"><i class="fa fa-link"></i></a>計算系リポジトリ</h3>
+
+<p>幾何計算や、SVGのパース処理などは使い回しやすいようライブラリ化しています。テストもそれなりに頑張って書いたので、もしSVGから図形をパースしてポリゴン化したいという稀有な希望をお持ちの方が居たらご活用ください。<br>
+<a href="https://github.com/miyanokomiya/okageo" class="autolink" rel="nofollow noopener" target="_blank">https://github.com/miyanokomiya/okageo</a></p>
+
+<h3>
+<span id="アプリ用リポジトリ" class="fragment"></span><a href="#%E3%82%A2%E3%83%97%E3%83%AA%E7%94%A8%E3%83%AA%E3%83%9D%E3%82%B8%E3%83%88%E3%83%AA"><i class="fa fa-link"></i></a>アプリ用リポジトリ</h3>
+
+<p>アプリとしての形を整えたものはここにあります。ただこちらは試行錯誤のままに作っていたのであまり整理はされていないです。<br>
+<a href="https://github.com/miyanokomiya/okadaphy" class="autolink" rel="nofollow noopener" target="_blank">https://github.com/miyanokomiya/okadaphy</a></p>
+
+<p>最終成果物は静的サイトとして公開もしてあるので、俺も岡田を切りたいという欲求をお持ちの方はご活用ください。<br>
+<a href="https://hopeful-visvesvaraya-3dafb6.netlify.com/" class="autolink" rel="nofollow noopener" target="_blank">https://hopeful-visvesvaraya-3dafb6.netlify.com/</a></p>

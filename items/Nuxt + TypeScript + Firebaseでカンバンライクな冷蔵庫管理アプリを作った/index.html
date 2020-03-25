@@ -1,0 +1,388 @@
+
+<h1>
+<span id="はじめに" class="fragment"></span><a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><i class="fa fa-link"></i></a>はじめに</h1>
+
+<p>たまに思い立って自分用に何か作って記事を書くがテンプレ化しつつあるフロントエンド人間です。<br>
+今回は前々から欲しいと思っていたものの、案がまとまらず放置していたものをやっとそれっぽい形にしました。動機となったテーマは、「冷蔵庫内の食材管理を手軽にしたい」です。</p>
+
+<p>フロントエンドでもはや避けては通れない潮流となっているTypeScriptと、最近勢いが凄まじい<a href="https://nuxtjs.org/" rel="nofollow noopener" target="_blank">Nuxt</a>の組み合わせで作ってみました。</p>
+
+<h1>
+<span id="tldr" class="fragment"></span><a href="#tldr"><i class="fa fa-link"></i></a>tl;dr</h1>
+
+<ul>
+<li>冷蔵庫内の食材をカンバン的に管理できるWebサービスを作った</li>
+<li>Nuxt使ってみた</li>
+<li>TypeScript使ってみた</li>
+<li>Firestore使ってみた</li>
+</ul>
+
+<p><a href="https://rich-fridge.firebaseapp.com/public" class="autolink" rel="nofollow noopener" target="_blank">https://rich-fridge.firebaseapp.com/public</a><br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F528d456d-90e0-01b0-dcae-888b8e953bc3.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=49f8fbc9134cdd4c81dafdf63c3c8d9b" target="_blank" rel="nofollow noopener"><img src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F528d456d-90e0-01b0-dcae-888b8e953bc3.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=49f8fbc9134cdd4c81dafdf63c3c8d9b" alt="Apr-05-2019 21-32-50.gif" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/172228/528d456d-90e0-01b0-dcae-888b8e953bc3.gif" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F528d456d-90e0-01b0-dcae-888b8e953bc3.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=68b8c3d7d5c0726d58cb8c017a70087f 1x" loading="lazy"></a></p>
+
+<h1>
+<span id="機能" class="fragment"></span><a href="#%E6%A9%9F%E8%83%BD"><i class="fa fa-link"></i></a>機能</h1>
+
+<h2>
+<span id="カンバン" class="fragment"></span><a href="#%E3%82%AB%E3%83%B3%E3%83%90%E3%83%B3"><i class="fa fa-link"></i></a>カンバン</h2>
+
+<p>行(レーン)と列(ステージ)のある典型的なカンバン方式で食材（アイテム）の状態を管理する。<br>
+レーンは複数作ることができ、冷蔵庫、冷凍庫など好きな区分を設けることが可能。</p>
+
+<p>アイテムの右端をタップすると次のステージに進む。最終ステージからは最初のステージに戻ってくるループ仕様。<br>
+「在庫十分 &gt; そろそろ危ない &gt; 在庫切れ」という感じで食材の状態管理が可能。</p>
+
+<p>タスク管理に使えなくもないが、アイテムが持てる情報は少なめなのでtrello使ったほうが幸せになれる。利用シーンの想定はあくまでも食材管理。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F26684563-d1e8-5137-a5db-9a95621c240c.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=03591a1980f4f03c65b7f2aab276bd52" target="_blank" rel="nofollow noopener"><img src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F26684563-d1e8-5137-a5db-9a95621c240c.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=03591a1980f4f03c65b7f2aab276bd52" alt="Apr-07-2019 15-54-01.gif" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/172228/26684563-d1e8-5137-a5db-9a95621c240c.gif" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F26684563-d1e8-5137-a5db-9a95621c240c.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=38df4177df90db57d688a59cd2238bfc 1x" loading="lazy"></a></p>
+
+<h2>
+<span id="サブレーン" class="fragment"></span><a href="#%E3%82%B5%E3%83%96%E3%83%AC%E3%83%BC%E3%83%B3"><i class="fa fa-link"></i></a>サブレーン</h2>
+
+<p>レーン内でさらにサブレーンを設置可能。「冷蔵庫 &gt; 野菜」、「常温 &gt; 飲料」などの整理ができる。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F83d56a5e-0942-eb7a-01ae-e0ab5d41958d.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=25444385aac873a2fce494065041278c" target="_blank" rel="nofollow noopener"><img src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F83d56a5e-0942-eb7a-01ae-e0ab5d41958d.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=25444385aac873a2fce494065041278c" alt="Apr-07-2019 18-34-47.gif" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/172228/83d56a5e-0942-eb7a-01ae-e0ab5d41958d.gif" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F83d56a5e-0942-eb7a-01ae-e0ab5d41958d.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=ad110990f9aa0222d4e863e60520340a 1x" loading="lazy"></a></p>
+
+<p>いくらでもサブレーンをネストしていけたら面白そうな気もするが、データ構造は問題なくてもUI設計が厳しいので１階層のみ。</p>
+
+<h2>
+<span id="テンプレート" class="fragment"></span><a href="#%E3%83%86%E3%83%B3%E3%83%97%E3%83%AC%E3%83%BC%E3%83%88"><i class="fa fa-link"></i></a>テンプレート</h2>
+
+<p>おすすめのそれっぽいカンバン構成でさくっと初期化可能。レーンとステージを全て削除すると選択できる。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F54c9057b-c1ea-8ff5-645e-c4df6cc0877e.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=0c148f2468186d27f34096469e8aecf9" target="_blank" rel="nofollow noopener"><img width="332" alt="スクリーンショット 2019-04-07 18.36.10.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F54c9057b-c1ea-8ff5-645e-c4df6cc0877e.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=0c148f2468186d27f34096469e8aecf9" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/172228/54c9057b-c1ea-8ff5-645e-c4df6cc0877e.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F54c9057b-c1ea-8ff5-645e-c4df6cc0877e.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=166d1e060ace865feef0f56fa599e47e 1x" loading="lazy"></a></p>
+
+<h2>
+<span id="公開ファイル" class="fragment"></span><a href="#%E5%85%AC%E9%96%8B%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB"><i class="fa fa-link"></i></a>公開ファイル</h2>
+
+<p><a href="https://rich-fridge.firebaseapp.com/public" class="autolink" rel="nofollow noopener" target="_blank">https://rich-fridge.firebaseapp.com/public</a><br>
+認証不要で、URLさえ知っていれば誰でも読み書き可能ファイルを作成可能。見つかっていたずらされる可能性もゼロではないが、さくっと使いたい場合に便利かもしれない。<br>
+URLの再発行はできないので、見失ったら探すことはできない。</p>
+
+<p>後からマイページに複製することも可能。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F940be2e8-8b94-bdd9-ab8b-3c1ac378bf0f.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=24d49cd7f752bad0ed10d9008160e935" target="_blank" rel="nofollow noopener"><img width="335" alt="スクリーンショット 2019-04-07 18.37.10.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F940be2e8-8b94-bdd9-ab8b-3c1ac378bf0f.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=24d49cd7f752bad0ed10d9008160e935" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/172228/940be2e8-8b94-bdd9-ab8b-3c1ac378bf0f.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F940be2e8-8b94-bdd9-ab8b-3c1ac378bf0f.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=f7b5a7e190c8a1e766183a93666a300b 1x" loading="lazy"></a></p>
+
+<h2>
+<span id="認証マイページ" class="fragment"></span><a href="#%E8%AA%8D%E8%A8%BC%E3%83%9E%E3%82%A4%E3%83%9A%E3%83%BC%E3%82%B8"><i class="fa fa-link"></i></a>認証マイページ</h2>
+
+<p><a href="https://rich-fridge.firebaseapp.com" class="autolink" rel="nofollow noopener" target="_blank">https://rich-fridge.firebaseapp.com</a><br>
+Google認証でログインが可能（Firebaseが提供してくれる機能をそのまま利用）。<br>
+自分だけしか読み書きできないファイルを作成できる。</p>
+
+<p>まだ誰かとファイルを共有することはできない。誰とは言わないが、作者が冷蔵庫を誰かと共有するような生活を送るようになったら機能が作られるかもしれない。</p>
+
+<h2>
+<span id="推奨端末" class="fragment"></span><a href="#%E6%8E%A8%E5%A5%A8%E7%AB%AF%E6%9C%AB"><i class="fa fa-link"></i></a>推奨端末</h2>
+
+<p>モバイルでの利用を前提として作っているのでモバイル端末推奨。<br>
+むしろ作者の所有端末であるiPhoneSEの画面サイズでのChrome開発環境でしか動作検証はしていない。</p>
+
+<p>それっぽいPWA対応がされているので、ホーム画面に追加すると快適なアプリライク環境となる（認証後ページのみ）。</p>
+
+<h2>
+<span id="アカウント削除" class="fragment"></span><a href="#%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E5%89%8A%E9%99%A4"><i class="fa fa-link"></i></a>アカウント削除</h2>
+
+<p>気が済んだらGoogle認証情報ごとアカウントを削除可能。<br>
+作ったデータを全て削除するようにCloud functionsが動き出す。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F74a3cd7d-af20-b6e5-03ae-a5fcfed06458.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=581058fc7b1efa614f875071ab6d036b" target="_blank" rel="nofollow noopener"><img width="343" alt="スクリーンショット 2019-04-07 18.38.45.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F74a3cd7d-af20-b6e5-03ae-a5fcfed06458.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=581058fc7b1efa614f875071ab6d036b" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/172228/74a3cd7d-af20-b6e5-03ae-a5fcfed06458.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F74a3cd7d-af20-b6e5-03ae-a5fcfed06458.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=7148922fedcf6b864c5f6ffade476613 1x" loading="lazy"></a></p>
+
+<h2>
+<span id="注意" class="fragment"></span><a href="#%E6%B3%A8%E6%84%8F"><i class="fa fa-link"></i></a>注意</h2>
+
+<p>Firestoreの無料プラン（Spark）準拠。Documentの読み取りが5万/日なので、それ以上の利用があると多分サービスが止まる。取らぬ狸の皮算用ということでそんな事態はなってから考える。<br>
+<a href="https://firebase.google.com/pricing/?authuser=0" class="autolink" rel="nofollow noopener" target="_blank">https://firebase.google.com/pricing/?authuser=0</a></p>
+
+<p>Google認証をした場合、メールアドレスはFirebaseコンソールから見れる。プライバシーポリシーなどは特に用意していないので、作ったデータと合わせて取り扱いは作者の良心を信じるしかないという前提で。</p>
+
+<h1>
+<span id="構成" class="fragment"></span><a href="#%E6%A7%8B%E6%88%90"><i class="fa fa-link"></i></a>構成</h1>
+
+<p>以前Nuxt + TypeScriptを試そうとして大苦戦した記憶があったものの、最新版Nuxtは既にTypeScriptサポートをしてくれているので今回はあまり苦戦しなかった。むしろ後述するビルドスピード改善のほうがよっぽど時間がかかった。<br>
+<a href="https://nuxtjs.org/guide/typescript/" class="autolink" rel="nofollow noopener" target="_blank">https://nuxtjs.org/guide/typescript/</a></p>
+
+<h2>
+<span id="nuxt251" class="fragment"></span><a href="#nuxt251"><i class="fa fa-link"></i></a>Nuxt(2.5.1)</h2>
+
+<p><code>create-nuxt-app(6.7.0)</code>にてプロジェクト新規作成後、TypeScriptに対応した最新版のNuxtが使いたかったのでとりあえず全アップグレード。</p>
+
+<div class="code-frame" data-lang="sh"><div class="highlight"><pre><span class="nv">$ </span>yarn upgrade-interactive <span class="nt">--latest</span>
+</pre></div></div>
+
+<p>package.jsonはこんな感じ。<code>@nuxt/typescript</code>、<code>vue-property-decorator</code>あたりは手動で<code>install</code>した記憶がある。</p>
+
+<div class="code-frame" data-lang="json"><div class="highlight"><pre><span class="p">{</span><span class="w">
+  </span><span class="err">~</span><span class="w"> </span><span class="err">略</span><span class="w"> </span><span class="err">~</span><span class="w">
+  </span><span class="nl">"dependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"@fortawesome/fontawesome-svg-core"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^1.2.17"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"@fortawesome/free-solid-svg-icons"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^5.8.1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"@fortawesome/vue-fontawesome"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^0.1.6"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"@nuxtjs/axios"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^5.4.1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"@nuxtjs/pwa"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^2.6.0"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"cross-env"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^5.2.0"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"firebase"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^5.9.1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"nuxt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^2.5.1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"nuxt-fontawesome"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^0.4.0"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"devDependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"@nuxt/typescript"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^2.5.1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"@nuxtjs/eslint-config"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^0.0.1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"@types/jest"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^24.0.11"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"@typescript-eslint/eslint-plugin"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^1.5.0"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"@vue/test-utils"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^1.0.0-beta.27"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"autoprefixer"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^9.5.0"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"babel-core"</span><span class="p">:</span><span class="w"> </span><span class="s2">"7.0.0-bridge.0"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"babel-eslint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^10.0.1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"babel-jest"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^24.5.0"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"eslint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^5.15.3"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"eslint-config-prettier"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^4.1.0"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"eslint-config-standard"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&gt;=12.0.0"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"eslint-loader"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^2.1.2"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"eslint-plugin-import"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&gt;=2.16.0"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"eslint-plugin-jest"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^22.4.1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"eslint-plugin-node"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&gt;=8.0.1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"eslint-plugin-nuxt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&gt;=0.4.3"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"eslint-plugin-prettier"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^3.0.1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"eslint-plugin-promise"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&gt;=4.0.1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"eslint-plugin-standard"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&gt;=4.0.0"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"eslint-plugin-vue"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^5.2.2"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"jest"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^24.5.0"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"nodemon"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^1.18.10"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"prettier"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^1.16.4"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"tailwindcss"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^0.7.4"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ts-jest"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^24.0.0"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"vue-jest"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^3.0.4"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"vue-property-decorator"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^8.1.0"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></pre></div></div>
+
+<p>たまには<code>yarn</code>でなくて素の<code>npm</code>でも使ってみようかなと思ってしばらく使ってみたが、<code>yarn upgrade-interactive</code>に似たことをしたくて<code>npm-check</code>というパッケージをインストールしたあたりで、「これ<code>yarn</code>インストールすればよくない？」と気づいてしまって試みは終了。</p>
+
+<h3>
+<span id="typescript" class="fragment"></span><a href="#typescript"><i class="fa fa-link"></i></a>TypeScript</h3>
+
+<h4>
+<span id="tsconfigjson" class="fragment"></span><a href="#tsconfigjson"><i class="fa fa-link"></i></a>tsconfig.json</h4>
+
+<p><code>{}</code>とだけ書いた<code>tsconfig.json</code>を設置した状態でNuxtを起動すると、TypeScriptを利用したいことを勝手に汲み取ってくれて必要な設定を<code>tsconfig.json</code>に書き込んでくれる。<br>
+TypeScript化に必要なパッケージが未インストールだと色々とエラーが出るので追加していく（何を入れたかは失念）。</p>
+
+<p>追加で、Vueコンポーネントを<a href="https://github.com/kaorun343/vue-property-decorator" rel="nofollow noopener" target="_blank">vue-property-decorator</a>で書けるように設定を調整。</p>
+
+<div class="code-frame" data-lang="json"><div class="highlight"><pre><span class="p">{</span><span class="w">
+  </span><span class="nl">"compilerOptions"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"baseUrl"</span><span class="p">:</span><span class="w"> </span><span class="s2">"."</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"experimentalDecorators"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"emitDecoratorMetadata"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"allowJs"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"paths"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"~/*"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="s2">"./*"</span><span class="w">
+      </span><span class="p">],</span><span class="w">
+      </span><span class="nl">"@/*"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="s2">"./*"</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nl">"target"</span><span class="p">:</span><span class="w"> </span><span class="s2">"esnext"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"module"</span><span class="p">:</span><span class="w"> </span><span class="s2">"esnext"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"moduleResolution"</span><span class="p">:</span><span class="w"> </span><span class="s2">"node"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"lib"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="s2">"esnext"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"esnext.asynciterable"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"dom"</span><span class="w">
+    </span><span class="p">],</span><span class="w">
+    </span><span class="nl">"esModuleInterop"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"sourceMap"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"strict"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"noImplicitAny"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"noEmit"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"allowSyntheticDefaultImports"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"types"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="s2">"@types/node"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"@nuxt/vue-app"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"jest"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"./types"</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></pre></div></div>
+
+<h4>
+<span id="eslintrc" class="fragment"></span><a href="#eslintrc"><i class="fa fa-link"></i></a>.eslintrc</h4>
+
+<div class="code-frame" data-lang="js"><div class="highlight"><pre><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">root</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="na">env</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">browser</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="na">node</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">jest/globals</span><span class="dl">'</span><span class="p">:</span> <span class="kc">true</span>
+  <span class="p">},</span>
+  <span class="na">parserOptions</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">parser</span><span class="p">:</span> <span class="dl">'</span><span class="s1">@typescript-eslint/parser</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">ecmaFeatures</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">legacyDecorators</span><span class="p">:</span> <span class="kc">true</span>
+    <span class="p">},</span>
+    <span class="na">project</span><span class="p">:</span> <span class="dl">'</span><span class="s1">./tsconfig.json</span><span class="dl">'</span>
+  <span class="p">},</span>
+  <span class="na">extends</span><span class="p">:</span> <span class="p">[</span>
+    <span class="dl">'</span><span class="s1">@nuxtjs</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">plugin:nuxt/recommended</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">plugin:prettier/recommended</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">prettier</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">prettier/vue</span><span class="dl">'</span>
+  <span class="p">],</span>
+  <span class="na">plugins</span><span class="p">:</span> <span class="p">[</span><span class="dl">'</span><span class="s1">prettier</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">@typescript-eslint</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">jest</span><span class="dl">'</span><span class="p">],</span>
+  <span class="na">rules</span><span class="p">:</span> <span class="p">{</span>
+    <span class="dl">'</span><span class="s1">nuxt/no-cjs-in-config</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">off</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">no-console</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">off</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">vue/attribute-hyphenation</span><span class="dl">'</span><span class="p">:</span> <span class="p">[</span><span class="dl">'</span><span class="s1">error</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">never</span><span class="dl">'</span><span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div></div>
+
+<h4>
+<span id="nuxtのビルドが遅すぎる問題" class="fragment"></span><a href="#nuxt%E3%81%AE%E3%83%93%E3%83%AB%E3%83%89%E3%81%8C%E9%81%85%E3%81%99%E3%81%8E%E3%82%8B%E5%95%8F%E9%A1%8C"><i class="fa fa-link"></i></a>Nuxtのビルドが遅すぎる問題</h4>
+
+<p>これまでNuxtをさくっと試すたびに思っていたのだが、ビルドが遅すぎる。初回起動に時間がかかるのは仕方ないにしても、<code>watch</code>モードの差分ビルドでも時間がかかりすぎる。<br>
+まるっと全部いい感じにしてくれるNuxtの黒魔術故にそんなものなのかとも考えていたが、ちょっといじったスタイルが反映されるのに毎回1分近く待たされるのはさすがに許容できる範囲ではなかった。</p>
+
+<p>どこで時間がかかっているのか調べまわって判明した犯人はEslint。<code>nuxt.config.js</code>からEslint部分をコメントアウトしたら差分ビルドも1~2秒で終わるようになってやっと人権のある開発環境となった。<br>
+lintエラーを見逃してしまう可能性は上がるが、prettier入ってるし保存するときに自動整形する設定しておけばそんな見逃すこともないだろうということで解除。</p>
+
+<p>おそらく不要なファイルまでEslint対象に含まれてしまっているとかだろうからそのあたりの設定を見直すべきなのだろうが、<code>.eslintignore</code>を少し弄ってみても改善できなかったので今後の課題として今は妥協。</p>
+
+<div class="code-frame" data-lang="js"><div class="highlight"><pre>  <span class="cm">/*
+   ** Build configuration
+   */</span>
+  <span class="nx">build</span><span class="p">:</span> <span class="p">{</span>
+    <span class="cm">/*
+     ** You can extend webpack config here
+     */</span>
+    <span class="nx">extend</span><span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="nx">ctx</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// Run ESLint on save</span>
+      <span class="c1">// build速度が20倍くらい違うので外す</span>
+      <span class="c1">// if (ctx.isDev &amp;&amp; ctx.isClient) {</span>
+      <span class="c1">//   config.module.rules.push({</span>
+      <span class="c1">//     enforce: 'pre',</span>
+      <span class="c1">//     test: /\.(js|vue)$/,</span>
+      <span class="c1">//     loader: 'eslint-loader',</span>
+      <span class="c1">//     exclude: /(node_modules)/</span>
+      <span class="c1">//   })</span>
+      <span class="c1">// }</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+</pre></div></div>
+
+<h3>
+<span id="jest" class="fragment"></span><a href="#jest"><i class="fa fa-link"></i></a>Jest</h3>
+
+<p>最近は流行に乗っかりテストはJestを採用。</p>
+
+<h4>
+<span id="jestconfigjs" class="fragment"></span><a href="#jestconfigjs"><i class="fa fa-link"></i></a>jest.config.js</h4>
+
+<p>TypeScript対応をしたくらいで<code>create-nuxt-app</code>の初期状態からそれほど変更はなし。</p>
+
+<div class="code-frame" data-lang="js"><div class="highlight"><pre><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">setupFiles</span><span class="p">:</span> <span class="p">[</span><span class="dl">'</span><span class="s1">&lt;rootDir&gt;/test/jest.setup.js</span><span class="dl">'</span><span class="p">],</span>
+  <span class="na">moduleNameMapper</span><span class="p">:</span> <span class="p">{</span>
+    <span class="dl">'</span><span class="s1">^@/(.*)$</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">&lt;rootDir&gt;/$1</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">^~/(.*)$</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">&lt;rootDir&gt;/$1</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">^vue$</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">vue/dist/vue.common.js</span><span class="dl">'</span>
+  <span class="p">},</span>
+  <span class="na">moduleFileExtensions</span><span class="p">:</span> <span class="p">[</span><span class="dl">'</span><span class="s1">js</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">ts</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">vue</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">json</span><span class="dl">'</span><span class="p">],</span>
+  <span class="na">transform</span><span class="p">:</span> <span class="p">{</span>
+    <span class="dl">'</span><span class="s1">^.+</span><span class="se">\\</span><span class="s1">.jsx?$</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">babel-jest</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">^.+</span><span class="se">\\</span><span class="s1">.tsx?$</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">ts-jest</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">^.+</span><span class="se">\\</span><span class="s1">.vue$</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">vue-jest</span><span class="dl">'</span>
+  <span class="p">},</span>
+  <span class="na">globals</span><span class="p">:</span> <span class="p">{</span>
+    <span class="dl">'</span><span class="s1">ts-jest</span><span class="dl">'</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">tsConfig</span><span class="p">:</span> <span class="dl">'</span><span class="s1">tsconfig.json</span><span class="dl">'</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="na">testRegex</span><span class="p">:</span> <span class="dl">'</span><span class="s1">(/__tests__/.*|(</span><span class="se">\\</span><span class="s1">.|/)(test|spec))</span><span class="se">\\</span><span class="s1">.(jsx?|tsx?)$</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">testPathIgnorePatterns</span><span class="p">:</span> <span class="p">[</span>
+    <span class="dl">'</span><span class="s1">&lt;rootDir&gt;/node_modules/</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">&lt;rootDir&gt;/.nuxt/</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">&lt;rootDir&gt;/coverage/</span><span class="dl">'</span>
+  <span class="p">],</span>
+  <span class="na">collectCoverage</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+  <span class="na">collectCoverageFrom</span><span class="p">:</span> <span class="p">[</span>
+    <span class="dl">'</span><span class="s1">&lt;rootDir&gt;/components/**/*.vue</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">&lt;rootDir&gt;/pages/**/*.vue</span><span class="dl">'</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div></div>
+
+<h4>
+<span id="dockerコンテナ内でjestが遅すぎる問題" class="fragment"></span><a href="#docker%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E5%86%85%E3%81%A7jest%E3%81%8C%E9%81%85%E3%81%99%E3%81%8E%E3%82%8B%E5%95%8F%E9%A1%8C"><i class="fa fa-link"></i></a>Dockerコンテナ内でJestが遅すぎる問題</h4>
+
+<p>Nuxtビルドが遅い問題は完全にEslint起因だったが、Jestは最初からEslintをかけていなかったにも関わらず実行がとんでもなく遅かった。<code>watch</code>モードで差分ビルドをするときでも半端なく遅く、１ファイルごとに20秒くらいかかっているような状況だった。</p>
+
+<p>この問題はDocker環境起因らしく、公式に書いてあった<code>--runInBand</code>オプションを付ける対応をしたら解決。<br>
+<a href="https://doc.ebichu.cc/jest/docs/ja/troubleshooting.html#docker-ci" class="autolink" rel="nofollow noopener" target="_blank">https://doc.ebichu.cc/jest/docs/ja/troubleshooting.html#docker-ci</a></p>
+
+<h3>
+<span id="tailwind-css" class="fragment"></span><a href="#tailwind-css"><i class="fa fa-link"></i></a><a href="https://tailwindcss.com/docs/what-is-tailwind/" rel="nofollow noopener" target="_blank">Tailwind CSS</a>
+</h3>
+
+<p>nuxt-create-appでプロジェクト作成するときに選択肢にあったのでそのまま採用。<br>
+最初は<a href="https://vuetifyjs.com/ja/" rel="nofollow noopener" target="_blank">Vuetify</a>を使うつもりだったが、TypeScript化したらコンソールにエラーが表示されるようになって解決できなかったので噂のTailwind CSSにチャレンジ。</p>
+
+<p>Tailwind CSSはスタイルを簡単に指定できる<code>class</code>を提供してくれるだけでコンポーネントは含まれていない。ただし豊富なサンプルもあるので特に不便は感じなかった。むしろ本当に欲しかったものの最小構成感が心地よい。<br>
+<a href="https://tailwindcomponents.com/" class="autolink" rel="nofollow noopener" target="_blank">https://tailwindcomponents.com/</a></p>
+
+<p>その特性上<code>class</code>指定が多くなり、<code>&lt;style&gt;</code>を書くことがかなり減った。そしてせっかくなので今回は<code>&lt;style&gt;</code>を捨ててCSS in JSな書き方に寄せてみた。<br>
+一般にどちらがいいかの結論は出せないが、Tailwind CSSを使うなら<code>class</code>と<code>&lt;style&gt;</code>にスタイル情報が分断されるよりは、両者を近い場所に書けるCSS in JSの方が見やすそう。</p>
+
+<p>とはいえ完全に<code>&lt;style&gt;</code>を捨てることはできず、<code>&lt;transition&gt;</code>利用のスタイル指定などは<code>&lt;style&gt;</code>で行っている。</p>
+
+<p>Tailwind CSSと<a href="https://fontawesome.com/" rel="nofollow noopener" target="_blank">fontawesome</a>があればデザイン力が貧弱な個人開発者の悩みは８割方解決するのではなかろうか。fontawesomeをNuxtにいい感じに導入する方法も整備されているのでさくっと使い始められる。<br>
+<a href="https://qiita.com/OvThAlmin/items/154e53952bc46d91d44c" class="autolink" id="reference-37103d0d72927639e133">https://qiita.com/OvThAlmin/items/154e53952bc46d91d44c</a></p>
+
+<h3>
+<span id="pwa" class="fragment"></span><a href="#pwa"><i class="fa fa-link"></i></a>PWA</h3>
+
+<p><code>create-nuxt-app</code>でPWAを希望すれば全部いい感じに準備してくれる。ホーム画面に追加したらもちろん<code>standalone</code>で快適に使えるし、Service Workerでキャッシュもしてくれる。<br>
+アイコン類は変えたかったので、<code>static/</code>に入っていた<code>icon.png</code>と<code>favicon.ico</code>を差し替えて終わり。</p>
+
+<p>例によってデザイン力はないのでロゴどうしようかなと悩んでいたらこんな記事が目に入って神サービスを発見。<br>
+<a href="https://note.mu/rdlabo/n/n9a8f8391529c" class="autolink" rel="nofollow noopener" target="_blank">https://note.mu/rdlabo/n/n9a8f8391529c</a></p>
+
+<p>適当にポチポチしていくと適当な感じのアイコンが作れてしまって最高の体験だった。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2Ff883f288-d5ef-afe8-6ac0-83f7b947d566.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=782438d928549faf565987555eebd671" target="_blank" rel="nofollow noopener"><img src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2Ff883f288-d5ef-afe8-6ac0-83f7b947d566.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=782438d928549faf565987555eebd671" alt="D3hwAx0U8AEmAeV.png" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/172228/f883f288-d5ef-afe8-6ac0-83f7b947d566.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2Ff883f288-d5ef-afe8-6ac0-83f7b947d566.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=477f2c47b08a1c4b1bf5fe4e33f2abf1 1x" loading="lazy"></a></p>
+
+<h2>
+<span id="firebase" class="fragment"></span><a href="#firebase"><i class="fa fa-link"></i></a>Firebase</h2>
+
+<p>何かWebサービスを作りたくなってしまったフロントエンドエンジニアに最高のBaaSを提供してくれる頼れる存在。</p>
+
+<p>当初はCloud functionsからNuxtを使ってSSRしてみようかと目論んでいたが、SSRの必要性がなさすぎて頓挫。Nuxtを<code>mode: 'spa'</code>にしてビルドしたアセットをFirebaseにhostingするというシンプルなデプロイとなっている。<br>
+ただSSRしないにしても、ルーティングやミドルウェアなどNuxtの恩恵を大いに受けられることは変わりない。PWAのいい感じの設定まで用意しておいてくれるのはホスピタリティが高すぎる。</p>
+
+<h3>
+<span id="firestore" class="fragment"></span><a href="#firestore"><i class="fa fa-link"></i></a>Firestore</h3>
+
+<p>使い慣れたRealtimeDBでいいかとも考えたが、Firebaseが激しく推していしせっかくなので新しいものにチャレンジ。<br>
+DocumentとCollectionを中心としたら構造に最初は慣れないが、分かってくるとRealtimeDBでは実現できなかった表現力の可能性に気づき始める。</p>
+
+<p>ただしRealtimeDBが通信量ベースの従量課金だったのに対し、FirestoreはDocumentの読み書きベースに変更されている点は要注意。Document数なので、一覧データを取得したりするとその要素数分がカウントされていく。<br>
+個人でだけ使っている分には無料枠をはみ出る心配はそれほどないが、ある程度の利用量を期待していく場合は料金シミュレートは慎重にやったほうが良さそう。</p>
+
+<p>データ保護の権限設定もRealtimeDBより格段に表現力と書きやすさが向上している。<br>
+ただし権限判定のために行うDocumentの読み取りでも従量課金対象としてカウントされていくのが地味に怖い。複雑な権限判定を設定していくと、読み取り回数がどんどん掛け算されていくことになる。</p>
+
+<p>権限設定で不便だなと思ったのは、判定情報としてCollectionからクエリで取得したDocumentを使えないこと。関係テーブルみたいなCollectionを用意しておいて、<code>where('onwer', '==', id)</code>みたいな感じで権限を検索してという素朴な実装は成り立ちそうにない。</p>
+
+<p>Firestoreはまだベータだが、Firebaseが推しまくっているように確かにそのポテンシャルはRealtimeDBを凌駕しているのは間違いない。正式リリースに向けて今後もバシバシ素晴らしい機能が追加されていくことを期待して応援。</p>
+
+<h3>
+<span id="cloud-functions" class="fragment"></span><a href="#cloud-functions"><i class="fa fa-link"></i></a>Cloud functions</h3>
+
+<p>Firestoreの仕様で、Documentを削除してもその配下にあるCollection（サブコレクション）は削除されない。あくまでパスが重なっているというだけであって、データとして全く独立した存在らしい。<br>
+FirebaseコンソールからDocumentの削除をした場合はちゃんと配下のCollectionも一括で消してくれる。</p>
+
+<p>クライアント側でサブコレクションも消すようにすればいいかとも考えたが、ルートから辿れないサブコレクションはFirebaseコンソールでもパスを直打ちしないと見えないようになってしまってなんだか不安なので、Cloud functionsを使ってゴミが残りにくいように頑張っておく。</p>
+
+<p>FirestoreのドキュメントでもCollectionの一括削除をクライアント側でやるのは非推奨となっているので素直に従う。<br>
+<a href="https://firebase.google.com/docs/firestore/manage-data/delete-data?hl=ja" class="autolink" rel="nofollow noopener" target="_blank">https://firebase.google.com/docs/firestore/manage-data/delete-data?hl=ja</a></p>
+
+<p>サブコレクションを全部消したいというシチュエーションはかなりあると思うので、Firestore側にそういう機能が追加されることを期待したい。</p>

@@ -1,0 +1,11 @@
+<p><code>&lt;C-g&gt;</code>で表示はすぐできるのに、ヤンクはすぐできないもどかしさを解消したかった。</p>
+
+<div class="code-frame" data-lang="vim"><div class="highlight"><pre><span class="k">function</span><span class="p">!</span> ClipText<span class="p">(</span>data<span class="p">)</span>
+  <span class="k">let</span> @<span class="m">0</span><span class="p">=</span><span class="nv">a:data</span>
+  <span class="k">let</span> @"<span class="p">=</span><span class="nv">a:data</span>
+  <span class="k">let</span> @*<span class="p">=</span><span class="nv">a:data</span>
+<span class="k">endfunction</span>
+nnoremap <span class="p">&lt;</span>C<span class="p">-</span><span class="k">g</span><span class="p">&gt;</span> <span class="p">:</span><span class="k">call</span> ClipText<span class="p">(</span>expand<span class="p">(</span><span class="s1">'%'</span><span class="p">))&lt;</span>CR<span class="p">&gt;&lt;</span>C<span class="p">-</span><span class="k">g</span><span class="p">&gt;</span>
+</pre></div></div>
+
+<p>Thanks: <a href="https://gist.github.com/pinzolo/8168337" class="autolink" rel="nofollow noopener" target="_blank">https://gist.github.com/pinzolo/8168337</a></p>

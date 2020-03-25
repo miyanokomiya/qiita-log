@@ -1,0 +1,404 @@
+
+<h1>
+<span id="前説" class="fragment"></span><a href="#%E5%89%8D%E8%AA%AC"><i class="fa fa-link"></i></a>前説</h1>
+
+<p>どうも年一SVG芸人です。前回投稿から早一年経とうとしてますが、またVueとSVGでそれっぽい何かを作ったので紹介と、開発で遭遇した問題のポストモーテム的なものをまとめていきます。</p>
+
+<p>今回はElectronにも手を出してみました。</p>
+
+<h1>
+<span id="作ったもの" class="fragment"></span><a href="#%E4%BD%9C%E3%81%A3%E3%81%9F%E3%82%82%E3%81%AE"><i class="fa fa-link"></i></a>作ったもの</h1>
+
+<h2>
+<span id="概要" class="fragment"></span><a href="#%E6%A6%82%E8%A6%81"><i class="fa fa-link"></i></a>概要</h2>
+
+<ul>
+<li>github<br>
+<a href="https://github.com/miyanokomiya/svgif" class="autolink" rel="nofollow noopener" target="_blank">https://github.com/miyanokomiya/svgif</a>
+</li>
+<li>web版<br>
+<a href="https://svgif-c077b.firebaseapp.com/" class="autolink" rel="nofollow noopener" target="_blank">https://svgif-c077b.firebaseapp.com/</a>
+</li>
+<li>electron版<br>
+未公開（リポジトリクローンしてyarn devすれば使える！）</li>
+</ul>
+
+<p>GIFメーカーです。自産自消でさっそくそのGIFメーカーを使って作った概要GIFがこちらです。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F1e366e29-6907-8ba1-fdd9-5de7edb583ce.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=46184a36398d98b80cb079624eb5e550" target="_blank" rel="nofollow noopener"><img src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F1e366e29-6907-8ba1-fdd9-5de7edb583ce.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=46184a36398d98b80cb079624eb5e550" alt="サンプル.gif" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/172228/1e366e29-6907-8ba1-fdd9-5de7edb583ce.gif" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F1e366e29-6907-8ba1-fdd9-5de7edb583ce.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=a193cfea0072ac7e56d9be99c3baae66 1x" loading="lazy"></a></p>
+
+<h3>
+<span id="機能" class="fragment"></span><a href="#%E6%A9%9F%E8%83%BD"><i class="fa fa-link"></i></a>機能</h3>
+
+<ul>
+<li>背景画像ベースのタイムライン</li>
+<li>矩形、矢印、文字、画像の挿入と変形</li>
+<li>↑の履歴操作</li>
+<li>タイムラインレイヤー管理</li>
+<li>gifの個別フレーム設定</li>
+<li>gifプレビュー再生</li>
+<li>gif生成（容量が大きくなるとダウンロードボタンが機能しないので、右クリックから保存推奨）</li>
+<li>編集データの書き出しと読み込み</li>
+</ul>
+
+<h2>
+<span id="動機" class="fragment"></span><a href="#%E5%8B%95%E6%A9%9F"><i class="fa fa-link"></i></a>動機</h2>
+
+<p>定期的に湧いてくるSVGで何か作りたい欲に抗うことができず、たまたま<a href="https://jnordberg.github.io/gif.js/" rel="nofollow noopener" target="_blank">gif.js</a>というものが目に入ってしまった結果として手が動き出したのが発端です。<br>
+さらにたまたまElectronが目に入ってしまったがために無駄にElectron環境で作りました。</p>
+
+<p>なお今はgo言語に呼ばれている気がしてきてしまったので、このプロダクトは一旦切りを付けてしばらくgoの世界を探検してきます。</p>
+
+<h2>
+<span id="構成など" class="fragment"></span><a href="#%E6%A7%8B%E6%88%90%E3%81%AA%E3%81%A9"><i class="fa fa-link"></i></a>構成など</h2>
+
+<h3>
+<span id="vue" class="fragment"></span><a href="#vue"><i class="fa fa-link"></i></a><a href="https://jp.vuejs.org/index.html" rel="nofollow noopener" target="_blank">Vue</a>
+</h3>
+
+<p>VueのアドベントカレンダーなのでもちろんVueで作っています！<br>
+そしてもちろんみなさん既に当然ご存知のようにVueとSVGの組み合わせは相性ばっちりで、宣言的なSVG制御は今後のスタンダードとなっていくこと間違いなしでしょう。</p>
+
+<p>え？<a href="https://qiita.com/miyanokomiya/items/3d195d8b6e09097d0102" id="reference-a02c93362052d59956e6"><strong>ご存じない？</strong></a></p>
+
+<h3>
+<span id="electron" class="fragment"></span><a href="#electron"><i class="fa fa-link"></i></a><a href="https://electronjs.org/" rel="nofollow noopener" target="_blank">Electron</a>
+</h3>
+
+<p>vue-cliに<a href="https://github.com/SimulatedGREG/electron-vue" rel="nofollow noopener" target="_blank">Electronボイラープレート</a>があったのでそちらを利用しています。<br>
+しかしこのボイラープレートがなかなか癖が強く苦戦した箇所がちらほら・・後のポストモーテム集で紹介していきます。</p>
+
+<h3>
+<span id="svg" class="fragment"></span><a href="#svg"><i class="fa fa-link"></i></a>SVG</h3>
+
+<p>キャンバス部分の表示や図形を書いたりする部分はSVGで作っています。</p>
+
+<ul>
+<li><p>矩形<br>
+矩形編集を作っておけば円や画像にもそのまま使えて便利です。<br>
+編集はこんな感じ。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F3c183822-0f68-38df-2edf-133bdbd639b5.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=856aa2f564c26ad4820c35be2d0fe31a" target="_blank" rel="nofollow noopener"><img src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F3c183822-0f68-38df-2edf-133bdbd639b5.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=856aa2f564c26ad4820c35be2d0fe31a" alt="rec.gif" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/172228/3c183822-0f68-38df-2edf-133bdbd639b5.gif" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F3c183822-0f68-38df-2edf-133bdbd639b5.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=6df84944cde52ad53afafeafa34eecd5 1x" loading="lazy"></a></p></li>
+<li><p>矢印<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2Fc24d53f5-00d7-c744-a225-c46485e2b600.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=7f309da584b021ab2797d051ed966c19" target="_blank" rel="nofollow noopener"><img src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2Fc24d53f5-00d7-c744-a225-c46485e2b600.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=7f309da584b021ab2797d051ed966c19" alt="arrow.gif" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/172228/c24d53f5-00d7-c744-a225-c46485e2b600.gif" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2Fc24d53f5-00d7-c744-a225-c46485e2b600.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=16f524836efa583f9d3caf11ea776eb9 1x" loading="lazy"></a></p></li>
+</ul>
+
+<p>オールSVGで完結するかと思いきや、gif.jsに食わせるためにはcanvasに描画する必要があったのでcanvas要素も若干含まれています。<br>
+ただ（一部問題はあったものの）SVGはそのままcanvasに描画できたので、登場するのはほぼSVGのみです。</p>
+
+<h3>
+<span id="vue-material" class="fragment"></span><a href="#vue-material"><i class="fa fa-link"></i></a><a href="https://vuematerial.io/" rel="nofollow noopener" target="_blank">Vue Material</a>
+</h3>
+
+<p>見た目部分は楽したかったこともあり、コンポーネントフレームワークとしてVue Materialを利用しています。レイアウトは揃っているので面倒なアンカー処理とかせずに済むので助かります。</p>
+
+<p>今まで<a href="https://vuetifyjs.com/ja/" rel="nofollow noopener" target="_blank">Vuetify</a>を使うことが多かったんですが、たまには違うものも使ってみようと思いなんとなく使っています。<br>
+そこまで使い込んでいはいないので優劣は着けづらいですが、さくっと使う分にはどちらでも特に遜色はないかなという印象です。</p>
+
+<p>ただVue Materialは用意されているアイコンが少なく、拡張の仕方もよく分からなかったので、その点についてはVuetifyの方が揃っていて便利だったかなと思います。</p>
+
+<h3>
+<span id="firebase" class="fragment"></span><a href="#firebase"><i class="fa fa-link"></i></a><a href="https://firebase.google.com/?hl=ja" rel="nofollow noopener" target="_blank">Firebase</a>
+</h3>
+
+<p>Electronで作ったものの公開するにはやっぱりweb上で見れないと不便だよねということで頑張ってwebサイトとしてビルドしてFirebaseにホスティングしました。</p>
+
+<p>今回はローカルなアプリケーションとして完結させたかったので、サーバーとデータのやりとりはしていません。<br>
+編集データをサーバーに保存したりということもやっていないですが、もし不安であればネットワーク遮断した上での利用をおすすめします。</p>
+
+<p>ただ静的サイトをホスティングするためだけにFirebaseさんを使うのは若干無駄使い感もありましたが、やり方を知ってて一番手っ取り早くて安上がりな方法だったので贅沢に使わせていただきます。</p>
+
+<h1>
+<span id="できなかったこと" class="fragment"></span><a href="#%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%8B%E3%81%A3%E3%81%9F%E3%81%93%E3%81%A8"><i class="fa fa-link"></i></a>できなかったこと</h1>
+
+<h2>
+<span id="画面キャプチャ" class="fragment"></span><a href="#%E7%94%BB%E9%9D%A2%E3%82%AD%E3%83%A3%E3%83%97%E3%83%81%E3%83%A3"><i class="fa fa-link"></i></a>画面キャプチャ</h2>
+
+<p>じつは当初予定では、というよりElectronを使うならやってみたかったものの結局まとまらずに投稿日を迎えてしまったものがあります。</p>
+
+<p>ずばり画面キャプチャです。フロントエンドエンジニアのみなさんなら、「ブラウザ上でキャプチャしたい」という無茶要望を数千回と聞いてきたことでしょう。<br>
+しかしElectronという環境でなら、ブラウザを超えた世界を見ることができるので画面キャプチャを実装できない理由はもはやありません。</p>
+
+<p>そして実際にキャプチャができるそれっぽいものは作ったのですが、どうしても超えられない大きな問題が立ちふさがりました。<br>
+なんとElectronでは、<strong>windowの一部だけをクリック透過させることはできない</strong>という制限があるらしいのです。</p>
+
+<p><a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F6541966c-97c9-6094-4c67-cd32773dbae9.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=1ed5f016255a04ee7699d7a4e6a198cb" target="_blank" rel="nofollow noopener"><img width="627" alt="スクリーンショット 2018-12-02 17.02.07.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F6541966c-97c9-6094-4c67-cd32773dbae9.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=1ed5f016255a04ee7699d7a4e6a198cb" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/172228/6541966c-97c9-6094-4c67-cd32773dbae9.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F6541966c-97c9-6094-4c67-cd32773dbae9.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=1b6a09753a1942e15b03f8fa3cb5a785 1x" loading="lazy"></a><br>
+こちらが実際に作ったそれっぽいキャプチャ用windowなんですが、残念なことにこれを全面に配置すると背景を触ることができなくなります。。。<br>
+他にも背景透過するとヘッダーも透過されてしまったりとまだまだ透過まわりには不便が多いみたいです。</p>
+
+<p>複数windowを組み合わせて一部透過しているような単一っぽいwindowをでっちあげるとか対処法はありそうですが、これだけでも重そうだったので今回のスコープからは泣く泣く削除となりました。</p>
+
+<p>いつかリベンジしたいと思いつつ、もし既にいい感じに実装している例などありましたら是非とも教えてください。</p>
+
+<h2>
+<span id="モバイル対応" class="fragment"></span><a href="#%E3%83%A2%E3%83%90%E3%82%A4%E3%83%AB%E5%AF%BE%E5%BF%9C"><i class="fa fa-link"></i></a>モバイル対応</h2>
+
+<p>「Electronを使うんだから仕方ない」精神のもと、早々にモバイル対応は諦めました。<br>
+久しぶりにデスクトップ特化なUIを考えていったんですが、モバイルを諦めた瞬間から世界は大きく広がると実感しました。<br>
+デスクトップでどっしりちまちまやりたいような領域では、マウス操作に特化したUIという選択もまだまだありなんだろうなとしみじみしていました。</p>
+
+<h1>
+<span id="ポストモーテム集" class="fragment"></span><a href="#%E3%83%9D%E3%82%B9%E3%83%88%E3%83%A2%E3%83%BC%E3%83%86%E3%83%A0%E9%9B%86"><i class="fa fa-link"></i></a>ポストモーテム集</h1>
+
+<p>以下、ポストモーテムという名の詰まったこと集です。<br>
+Vue + Electron + SVGで何かを作りたくなってしまった方々の助けに少しでもなってもらえたら詰まってた時間もうかばれてくれます。</p>
+
+<h2>
+<span id="vueとelectron" class="fragment"></span><a href="#vue%E3%81%A8electron"><i class="fa fa-link"></i></a>VueとElectron</h2>
+
+<p>実はElectronをまともに触るのは初だったのこともあり、詰まったことの大部分はElectron周りでのものでした。</p>
+
+<p>特に<a href="https://github.com/vue-electron/vuex-electron" rel="nofollow noopener" target="_blank">vuex-electron</a>という如何にも便利そうなプラグインを入れたことによる予期せぬ挙動が多かったです。<br>
+vue-cliでこれを使うかどうかの選択肢が出るのですが、どういうものかよく分かっていないうちは避けておくことをおすすめします。</p>
+
+<h3>
+<span id="actionとコンポーネントの描画タイミング" class="fragment"></span><a href="#action%E3%81%A8%E3%82%B3%E3%83%B3%E3%83%9D%E3%83%BC%E3%83%8D%E3%83%B3%E3%83%88%E3%81%AE%E6%8F%8F%E7%94%BB%E3%82%BF%E3%82%A4%E3%83%9F%E3%83%B3%E3%82%B0"><i class="fa fa-link"></i></a>actionとコンポーネントの描画タイミング</h3>
+
+<h4>
+<span id="現象" class="fragment"></span><a href="#%E7%8F%BE%E8%B1%A1"><i class="fa fa-link"></i></a>現象</h4>
+
+<ul>
+<li>同一スレッドで複数のactionをdispatchすると、更新前の状態のコンポーネントがちらついて見える。</li>
+</ul>
+
+<h4>
+<span id="例" class="fragment"></span><a href="#%E4%BE%8B"><i class="fa fa-link"></i></a>例</h4>
+
+<ul>
+<li>図形をドラッグで移動し、マウスアップのタイミングで移動確定actionをdispatchする。</li>
+<li>単独actionなら違和感なし。
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F838b4ae3-2053-3d93-1793-44dc826ccd44.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=5038f81f61db867d0eb7196556310a01" target="_blank" rel="nofollow noopener"><img src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F838b4ae3-2053-3d93-1793-44dc826ccd44.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=5038f81f61db867d0eb7196556310a01" alt="Nov-04-2018 11-15-27.gif" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/172228/838b4ae3-2053-3d93-1793-44dc826ccd44.gif" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F838b4ae3-2053-3d93-1793-44dc826ccd44.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=fe5aa329adfa138f60be3de810efe84e 1x" loading="lazy"></a>
+</li>
+<li>複数actionだとちらつく（ちらつかないときがあるのはgifのコマ落ちのため）。
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F0cb84f66-42a3-8108-da72-dd894e903258.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=a525b71e65b335461d9ca348768f046a" target="_blank" rel="nofollow noopener"><img src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F0cb84f66-42a3-8108-da72-dd894e903258.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=a525b71e65b335461d9ca348768f046a" alt="Nov-04-2018 11-18-07.gif" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/172228/0cb84f66-42a3-8108-da72-dd894e903258.gif" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F0cb84f66-42a3-8108-da72-dd894e903258.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=4a851d58574a4c0066d6a088602fc01c 1x" loading="lazy"></a>
+</li>
+</ul>
+
+<h4>
+<span id="原因" class="fragment"></span><a href="#%E5%8E%9F%E5%9B%A0"><i class="fa fa-link"></i></a>原因</h4>
+
+<ul>
+<li>同一スレッドで非同期処理を含むactionを複数dispatchすると、非同期処理が終わる度にstateの状態が更新される。</li>
+<li>state更新の度にcomponentは更新されるため、全ての変更が反映されきっていない状態で都度描画されてちらつく。</li>
+</ul>
+
+<p><strong>しかし今回の場合、actionに非同期処理は一切書かれていなかった</strong></p>
+
+<h4>
+<span id="真の原因" class="fragment"></span><a href="#%E7%9C%9F%E3%81%AE%E5%8E%9F%E5%9B%A0"><i class="fa fa-link"></i></a>真の原因</h4>
+
+<p>vuex-electronのsharedMutationはstateを全プロセスで共有するために、action内でプロセス間通信が挟まってからmutationがcommitされる。actionに非同期処理を入れた覚えがなくても必ず非同期処理になってしまうという罠。</p>
+
+<h4>
+<span id="対処方法" class="fragment"></span><a href="#%E5%AF%BE%E5%87%A6%E6%96%B9%E6%B3%95"><i class="fa fa-link"></i></a>対処方法</h4>
+
+<ul>
+<li>同一スレッドで複数のactinを実行しない or 単独actionで済むよう処理をまとめる。<br>
+</li>
+<li>今回のような場合、オブジェクト（矩形のやつ）の移動を確定するactionを１件ずつループでdispatchすることを避け、複数オブジェクトの移動を一発で確定するactionをdispatchする。</li>
+<li>mutationをこんな感じにし、単独と配列どちらでも更新できるようにした。</li>
+</ul>
+
+<div class="code-frame" data-lang="javascript"><div class="highlight"><pre><span class="p">[</span><span class="nx">types</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">UPDATE_SVG_ELEMENT</span><span class="p">](</span><span class="nx">state</span><span class="p">,</span> <span class="p">{</span> <span class="nx">svgElement</span><span class="p">,</span> <span class="nx">svgElementList</span> <span class="p">})</span> <span class="p">{</span>
+  <span class="nx">svgElementList</span> <span class="o">=</span> <span class="nx">svgElementList</span> <span class="o">||</span> <span class="p">[</span><span class="nx">svgElement</span><span class="p">]</span>
+  <span class="nx">svgElementList</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">svgElement</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="c1">// svgElementの更新処理</span>
+  <span class="p">})</span>
+<span class="p">}</span>
+</pre></div></div>
+
+<h4>
+<span id="所感" class="fragment"></span><a href="#%E6%89%80%E6%84%9F"><i class="fa fa-link"></i></a>所感</h4>
+
+<p>非同期処理が含まれているactionを同一スレッドで複数dispatchすると起こりうる現象なのだが、どう見てもactionに非同期処理なんて書かれていなかったので原因発見に時間がかかってしまった。真犯人はvuex-electron。</p>
+
+<h3>
+<span id="ビルドエラー-for-web-" class="fragment"></span><a href="#%E3%83%93%E3%83%AB%E3%83%89%E3%82%A8%E3%83%A9%E3%83%BC-for-web-"><i class="fa fa-link"></i></a>ビルドエラー for web ①</h3>
+
+<h4>
+<span id="現象-1" class="fragment"></span><a href="#%E7%8F%BE%E8%B1%A1-1"><i class="fa fa-link"></i></a>現象</h4>
+
+<p><code>yarn build:web</code>コマンドを実行すると、<code>fsモジュールが存在しない</code>というエラーになってしまう。</p>
+
+<h4>
+<span id="原因-1" class="fragment"></span><a href="#%E5%8E%9F%E5%9B%A0-1"><i class="fa fa-link"></i></a>原因</h4>
+
+<p><code>vuex-electron</code>が<code>fs</code>参照している。</p>
+
+<h4>
+<span id="対処方法-1" class="fragment"></span><a href="#%E5%AF%BE%E5%87%A6%E6%96%B9%E6%B3%95-1"><i class="fa fa-link"></i></a>対処方法</h4>
+
+<p>web用のwebpack設定ファイルに以下を追加する。</p>
+
+<div class="code-frame" data-lang="javascript"><div class="highlight"><pre><span class="nx">node</span><span class="p">:</span> <span class="p">{</span>
+  <span class="nl">fs</span><span class="p">:</span> <span class="dl">'</span><span class="s1">empty</span><span class="dl">'</span>
+<span class="p">}</span>
+</pre></div></div>
+
+<h4>
+<span id="所感-1" class="fragment"></span><a href="#%E6%89%80%E6%84%9F-1"><i class="fa fa-link"></i></a>所感</h4>
+
+<p>またもvuex-electron</p>
+
+<h3>
+<span id="ビルドエラー-for-web--1" class="fragment"></span><a href="#%E3%83%93%E3%83%AB%E3%83%89%E3%82%A8%E3%83%A9%E3%83%BC-for-web--1"><i class="fa fa-link"></i></a>ビルドエラー for web ②</h3>
+
+<h4>
+<span id="現象-2" class="fragment"></span><a href="#%E7%8F%BE%E8%B1%A1-2"><i class="fa fa-link"></i></a>現象</h4>
+
+<p><code>yarn build:web</code>コマンドを実行すると、<code>ERROR in unknown: Unexpected token</code>というエラーが起きてバンドルファイルが生成されない。</p>
+
+<h4>
+<span id="原因-2" class="fragment"></span><a href="#%E5%8E%9F%E5%9B%A0-2"><i class="fa fa-link"></i></a>原因</h4>
+
+<p><code>BabiliWebpackPlugin</code>がうまく動いていないっぽい。</p>
+
+<h4>
+<span id="対処方法-2" class="fragment"></span><a href="#%E5%AF%BE%E5%87%A6%E6%96%B9%E6%B3%95-2"><i class="fa fa-link"></i></a>対処方法</h4>
+
+<p>web用のwebpack設定ファイルにて<code>plugins</code>から<code>BabiliWebpackPlugin</code>を削除する。</p>
+
+<h4>
+<span id="所感-2" class="fragment"></span><a href="#%E6%89%80%E6%84%9F-2"><i class="fa fa-link"></i></a>所感</h4>
+
+<p>vue-cliのelectronボイラープレートそのままの状態ではこのエラーは起きなかったので、本当の理由は別のところにあるのかもしれない。<br>
+エラーメッセージから得られる情報が少なすぎるためとりあえず動いたこの方法で妥協。</p>
+
+<h3>
+<span id="ビルドエラー-for-web--2" class="fragment"></span><a href="#%E3%83%93%E3%83%AB%E3%83%89%E3%82%A8%E3%83%A9%E3%83%BC-for-web--2"><i class="fa fa-link"></i></a>ビルドエラー for web ③</h3>
+
+<h4>
+<span id="現象-3" class="fragment"></span><a href="#%E7%8F%BE%E8%B1%A1-3"><i class="fa fa-link"></i></a>現象</h4>
+
+<p>ビルドしたindex.htmlを開くと、<code>Uncaught TypeError: n.existsSync is not a function</code>というエラーが起きる。</p>
+
+<h4>
+<span id="原因-3" class="fragment"></span><a href="#%E5%8E%9F%E5%9B%A0-3"><i class="fa fa-link"></i></a>原因</h4>
+
+<p><code>'electron'</code>からモジュールを<code>import</code>している。</p>
+
+<h4>
+<span id="対処方法-3" class="fragment"></span><a href="#%E5%AF%BE%E5%87%A6%E6%96%B9%E6%B3%95-3"><i class="fa fa-link"></i></a>対処方法</h4>
+
+<p>ファイルのトップレベルではなく、<code>'electron'</code>モジュールを使う関数内で<code>require('electron')</code>する。<br>
+トップレベルで必要な場合は<code>process.env.IS_WEB</code>を使ってwebビルドかどうか分岐して<code>require</code>する。</p>
+
+<h4>
+<span id="所感-3" class="fragment"></span><a href="#%E6%89%80%E6%84%9F-3"><i class="fa fa-link"></i></a>所感</h4>
+
+<p>ファイルのトップレベルで<code>import</code>や<code>require</code>しているとwebpackが親切にバンドルしてくれてしまう。<br>
+vue-cliのelectronボイラープレートではwebビルド判定値を<code>process.env.IS_WEB</code>に入れてくれるので活用する。</p>
+
+<p>さらに一部のプラグイン(vuex-electron)でも同様の現象が起こるので、使うかどうかを分岐する必要がある。<br>
+vue-cliのelectronボイラープレートでvuex-electronをonにしてwebビルドすると、デフォルトのままでもブラウザでエラーになっているトラップあり。</p>
+
+<p>こんな感じでvuex-electronの利用を分岐すればよい。</p>
+
+<div class="code-frame" data-lang="javascript"><div class="highlight"><pre><span class="nx">plugins</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">IS_WEB</span>
+  <span class="p">?</span> <span class="p">[]</span>
+  <span class="p">:</span> <span class="p">[</span>
+      <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">vuex-electron</span><span class="dl">'</span><span class="p">).</span><span class="nx">createPersistedState</span><span class="p">(),</span>
+      <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">vuex-electron</span><span class="dl">'</span><span class="p">).</span><span class="nx">createSharedMutations</span><span class="p">()</span>
+    <span class="p">],</span>
+</pre></div></div>
+
+<p>↓PR出してみた。<br>
+<a href="https://github.com/SimulatedGREG/electron-vue/pull/751" class="autolink" rel="nofollow noopener" target="_blank">https://github.com/SimulatedGREG/electron-vue/pull/751</a></p>
+
+<h2>
+<span id="svg-1" class="fragment"></span><a href="#svg-1"><i class="fa fa-link"></i></a>SVG</h2>
+
+<h3>
+<span id="svgのアスペクト比が固定されてしまう" class="fragment"></span><a href="#svg%E3%81%AE%E3%82%A2%E3%82%B9%E3%83%9A%E3%82%AF%E3%83%88%E6%AF%94%E3%81%8C%E5%9B%BA%E5%AE%9A%E3%81%95%E3%82%8C%E3%81%A6%E3%81%97%E3%81%BE%E3%81%86"><i class="fa fa-link"></i></a>svgのアスペクト比が固定されてしまう</h3>
+
+<h4>
+<span id="現象-4" class="fragment"></span><a href="#%E7%8F%BE%E8%B1%A1-4"><i class="fa fa-link"></i></a>現象</h4>
+
+<h4>
+<span id="例-1" class="fragment"></span><a href="#%E4%BE%8B-1"><i class="fa fa-link"></i></a>例</h4>
+
+<ul>
+<li>タイムライン部分は時間に応じて引き伸ばして表示したいが、svgで作った赤枠のアスペクト比が崩れない。
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F08048e96-541b-fa85-9619-ce040fcfb523.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=81e7bacb55b0b023418e46810a38b612" target="_blank" rel="nofollow noopener"><img width="643" alt="スクリーンショット 2018-11-04 15.40.46.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F08048e96-541b-fa85-9619-ce040fcfb523.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=81e7bacb55b0b023418e46810a38b612" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/172228/08048e96-541b-fa85-9619-ce040fcfb523.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F08048e96-541b-fa85-9619-ce040fcfb523.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=7acc82b1ce4942d6d2ec7e35ed725915 1x" loading="lazy"></a>
+</li>
+</ul>
+
+<h4>
+<span id="原因-4" class="fragment"></span><a href="#%E5%8E%9F%E5%9B%A0-4"><i class="fa fa-link"></i></a>原因</h4>
+
+<ul>
+<li>svgにはpreserveAspectRatioというアスペクト比に関する属性があり、デフォルトだとアスペクト比が崩れないようになっている。</li>
+</ul>
+
+<h4>
+<span id="対処方法-4" class="fragment"></span><a href="#%E5%AF%BE%E5%87%A6%E6%96%B9%E6%B3%95-4"><i class="fa fa-link"></i></a>対処方法</h4>
+
+<ul>
+<li>preserveAspectRatio="none"という属性をsvgタグに付ける。<br>
+</li>
+</ul>
+
+<div class="code-frame" data-lang="haml"><div class="highlight"><pre><span class="nt">&lt;svg</span> <span class="na">preserveAspectRatio=</span><span class="s">"none"</span><span class="nt">&gt;&lt;/svg&gt;</span>
+</pre></div></div>
+
+<ul>
+<li>svg部分もアスペクト比を崩して引き伸ばされるようになる。
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2Fb62a6d7f-7659-c468-c835-ac422c250561.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=df059c5efbba097cc8467693a4d63c9f" target="_blank" rel="nofollow noopener"><img width="630" alt="スクリーンショット 2018-11-04 15.40.57.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2Fb62a6d7f-7659-c468-c835-ac422c250561.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=df059c5efbba097cc8467693a4d63c9f" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/172228/b62a6d7f-7659-c468-c835-ac422c250561.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2Fb62a6d7f-7659-c468-c835-ac422c250561.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=55a85e36984bb60a30ff18b86e9ae51a 1x" loading="lazy"></a>
+</li>
+</ul>
+
+<h4>
+<span id="所感-4" class="fragment"></span><a href="#%E6%89%80%E6%84%9F-4"><i class="fa fa-link"></i></a>所感</h4>
+
+<p>アスペクト比に関するsvgとcssの挙動。</p>
+
+<h3>
+<span id="imageを含んだsvgをimageのsrcとして指定できない" class="fragment"></span><a href="#image%E3%82%92%E5%90%AB%E3%82%93%E3%81%A0svg%E3%82%92image%E3%81%AEsrc%E3%81%A8%E3%81%97%E3%81%A6%E6%8C%87%E5%AE%9A%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%84"><i class="fa fa-link"></i></a><code>&lt;image&gt;</code>を含んだSVGをImageのsrcとして指定できない</h3>
+
+<h4>
+<span id="現象-5" class="fragment"></span><a href="#%E7%8F%BE%E8%B1%A1-5"><i class="fa fa-link"></i></a>現象</h4>
+
+<p>gif.jsに食わせるために、SVGをImage化してcanvasにdrawImageする必要があった。<br>
+SVG文字列をImageとして読み込む処理はこちら。</p>
+
+<div class="code-frame" data-lang="js"><div class="highlight"><pre><span class="kd">const</span> <span class="nx">DOMURL</span> <span class="o">=</span> <span class="nb">self</span><span class="p">.</span><span class="nx">URL</span> <span class="o">||</span> <span class="nb">self</span><span class="p">.</span><span class="nx">webkitURL</span> <span class="o">||</span> <span class="nb">self</span>
+<span class="kd">const</span> <span class="nx">img</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Image</span><span class="p">()</span>
+<span class="kd">const</span> <span class="nx">svg</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Blob</span><span class="p">([</span><span class="dl">'</span><span class="s1">SVG文字列</span><span class="dl">'</span><span class="p">],</span> <span class="p">{</span>
+  <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">image/svg+xml;charset=utf-8</span><span class="dl">'</span>
+<span class="p">})</span>
+<span class="kd">const</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">DOMURL</span><span class="p">.</span><span class="nx">createObjectURL</span><span class="p">(</span><span class="nx">svg</span><span class="p">)</span>
+<span class="nx">img</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// 好きな処理</span>
+<span class="p">}</span>
+<span class="nx">img</span><span class="p">.</span><span class="nx">src</span> <span class="o">=</span> <span class="nx">url</span>
+</pre></div></div>
+
+<p>この処理でImage化は成功したと思いきや、SVGに<code>&lt;image&gt;</code>タグが含まれている場合は<code>img.src = url</code>の部分でエラーになってしまっていた。</p>
+
+<div class="code-frame" data-lang="html"><div class="highlight"><pre><span class="nt">&lt;image</span> <span class="na">x=</span><span class="s">"0"</span> <span class="na">y=</span><span class="s">"0"</span> <span class="na">width=</span><span class="s">"100"</span> <span class="na">height=</span><span class="s">"100"</span> <span class="na">xlink:href=</span><span class="s">"画像URLやbase64"</span>  <span class="nt">/&gt;</span>
+</pre></div></div>
+
+<p>このエラーはブラウザ環境でのみ発生し、Electron環境では発生しない。<br>
+なのでクロスオリジン制約に引っかかるよくあるパターンを疑ったが、<code>&lt;image&gt;</code>タグでの画像URL、SVG画像URLを無駄にサーバー経由で取得するようにしても改善せず。</p>
+
+<h4>
+<span id="原因-5" class="fragment"></span><a href="#%E5%8E%9F%E5%9B%A0-5"><i class="fa fa-link"></i></a>原因</h4>
+
+<p><code>xmlns:xlink="http://www.w3.org/1999/xlink"</code>という属性が<code>&lt;image&gt;</code>タグに付けられていない。<br>
+<strong>Electron環境ではなぜか勝手にこの属性が付与される。</strong></p>
+
+<h4>
+<span id="対処方法-5" class="fragment"></span><a href="#%E5%AF%BE%E5%87%A6%E6%96%B9%E6%B3%95-5"><i class="fa fa-link"></i></a>対処方法</h4>
+
+<p><code>xmlns:xlink</code>属性を`タグに付ける。</p>
+
+<div class="code-frame" data-lang="html"><div class="highlight"><pre><span class="nt">&lt;image</span> <span class="na">x=</span><span class="s">"0"</span> <span class="na">y=</span><span class="s">"0"</span> <span class="na">width=</span><span class="s">"100"</span> <span class="na">height=</span><span class="s">"100"</span> <span class="na">xlink:href=</span><span class="s">"画像URLやbase64"</span> <span class="na">xmlns:xlink=</span><span class="s">"http://www.w3.org/1999/xlink"</span> <span class="nt">/&gt;</span>
+</pre></div></div>
+
+<h4>
+<span id="所感-5" class="fragment"></span><a href="#%E6%89%80%E6%84%9F-5"><i class="fa fa-link"></i></a>所感</h4>
+
+<p>発生する例外のメッセージが空で情報が少なすぎるために原因特定に時間がかかってしまった。<br>
+Electron環境で生成したSVG文字列と、ブラウザ環境で生成したSVG文字列を見比べてみてやっとどこに差分があるか気づいて対処方法発見に至る。</p>
+
+<p>繰り返すが、<strong>Electron環境ではなぜか勝手にこの属性が付与される。</strong></p>
+
+<p>画像を無駄にサーバーから返すために、firebaseのstorageを初めて使ったという若干のプラス要素。無料プランだと容量が心もとないが、サーバーレスな使い心地が素晴らしい。</p>

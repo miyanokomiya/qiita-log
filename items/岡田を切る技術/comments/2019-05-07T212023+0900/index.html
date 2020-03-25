@@ -1,0 +1,10 @@
+<blockquote>
+<p>半濁点の処理がうまくいきませんでした。</p>
+</blockquote>
+
+<p>発見ありがとうございます、ひとまず対応しました。</p>
+
+<p><a href="../../../.../img/30_7.png" target="_blank" rel="nofollow noopener"><img width="174" alt="スクリーンショット 2019-05-07 21.14.55.png" src="../../../.../img/30_7.png" data-canonical-src="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/172228/e84e4721-fc84-e916-2c70-23c91df45e1a.png" loading="lazy"></a></p>
+
+<p>原因は点のポリゴン内判定にて任意のベクトルを上の図のように引いた結果、頂点を通っていたことでした。<br>
+よって２つの辺に接触 =&gt; 偶数回の接触なので面外である =&gt; 半濁点の内部の円は外側の円に含まれていないとみなされてしまっていました。</p>

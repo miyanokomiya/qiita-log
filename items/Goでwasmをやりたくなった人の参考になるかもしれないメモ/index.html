@@ -1,0 +1,338 @@
+
+<h2>
+<span id="経緯箇条書き" class="fragment"></span><a href="#%E7%B5%8C%E7%B7%AF%E7%AE%87%E6%9D%A1%E6%9B%B8%E3%81%8D"><i class="fa fa-link"></i></a>経緯箇条書き</h2>
+
+<ul>
+<li>フロントエンドエンジニアだけどGoを書きたい</li>
+<li>wasmやれば全てが解決するんじゃないかと軽い気持ちで手を出した</li>
+<li>想像以上に資料が少ない</li>
+<li>ひたすら試行錯誤</li>
+<li>もしかしたら誰かの役にたつかもしれないからまとめておく</li>
+</ul>
+
+<h2>
+<span id="注意" class="fragment"></span><a href="#%E6%B3%A8%E6%84%8F"><i class="fa fa-link"></i></a>注意</h2>
+
+<ul>
+<li>Goのwasmは始まったばかりでこれからも急激に変化していくと思われる</li>
+<li>この記事の内容は2018年12月時点での情報</li>
+<li>goのバージョンは<code>go1.11.4</code>
+</li>
+</ul>
+
+<h2>
+<span id="go側でjsを扱う" class="fragment"></span><a href="#go%E5%81%B4%E3%81%A7js%E3%82%92%E6%89%B1%E3%81%86"><i class="fa fa-link"></i></a>Go側でjsを扱う</h2>
+
+<h3>
+<span id="前置き" class="fragment"></span><a href="#%E5%89%8D%E7%BD%AE%E3%81%8D"><i class="fa fa-link"></i></a>前置き</h3>
+
+<p>大体ここに書いてある<br>
+<a href="https://medium.zenika.com/go-1-11-webassembly-for-the-gophers-ae4bb8b1ee03" class="autolink" rel="nofollow noopener" target="_blank">https://medium.zenika.com/go-1-11-webassembly-for-the-gophers-ae4bb8b1ee03</a></p>
+
+<h3>
+<span id="汎用" class="fragment"></span><a href="#%E6%B1%8E%E7%94%A8"><i class="fa fa-link"></i></a>汎用</h3>
+
+<ul>
+<li>グローバル取得<br>
+</li>
+</ul>
+
+<div class="code-frame" data-lang="go"><div class="highlight"><pre><span class="n">global</span> <span class="o">:=</span> <span class="n">js</span><span class="o">.</span><span class="n">Global</span><span class="p">()</span>
+</pre></div></div>
+
+<ul>
+<li>関数実行<br>
+</li>
+</ul>
+
+<div class="code-frame" data-lang="go"><div class="highlight"><pre><span class="n">fn</span><span class="o">.</span><span class="n">Invoke</span><span class="p">(</span><span class="n">引数1</span><span class="p">,</span> <span class="n">引数2</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</pre></div></div>
+
+<ul>
+<li>undefined取得<br>
+</li>
+</ul>
+
+<div class="code-frame" data-lang="go"><div class="highlight"><pre><span class="n">js</span><span class="o">.</span><span class="n">Undefined</span><span class="p">()</span>
+</pre></div></div>
+
+<ul>
+<li>null取得<br>
+</li>
+</ul>
+
+<div class="code-frame" data-lang="go"><div class="highlight"><pre><span class="n">js</span><span class="o">.</span><span class="n">Null</span><span class="p">()</span>
+</pre></div></div>
+
+<ul>
+<li>bool変換<br>
+</li>
+</ul>
+
+<div class="code-frame" data-lang="go"><div class="highlight"><pre><span class="n">value</span><span class="o">.</span><span class="n">Bool</span><span class="p">()</span>
+</pre></div></div>
+
+<ul>
+<li>int変換<br>
+</li>
+</ul>
+
+<div class="code-frame" data-lang="go"><div class="highlight"><pre><span class="n">value</span><span class="o">.</span><span class="n">Int</span><span class="p">()</span>
+</pre></div></div>
+
+<ul>
+<li>float64変換<br>
+</li>
+</ul>
+
+<div class="code-frame" data-lang="go"><div class="highlight"><pre><span class="n">value</span><span class="o">.</span><span class="n">Float</span><span class="p">()</span>
+</pre></div></div>
+
+<ul>
+<li>string変換<br>
+</li>
+</ul>
+
+<div class="code-frame" data-lang="go"><div class="highlight"><pre><span class="n">value</span><span class="o">.</span><span class="n">String</span><span class="p">()</span>
+</pre></div></div>
+
+<h3>
+<span id="オブジェクト" class="fragment"></span><a href="#%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88"><i class="fa fa-link"></i></a>オブジェクト</h3>
+
+<ul>
+<li>オブジェクトを作る<br>
+</li>
+</ul>
+
+<div class="code-frame" data-lang="go"><div class="highlight"><pre><span class="n">obj</span> <span class="o">:=</span> <span class="n">js</span><span class="o">.</span><span class="n">Global</span><span class="p">()</span><span class="o">.</span><span class="n">Get</span><span class="p">(</span><span class="s">"Object"</span><span class="p">)</span><span class="o">.</span><span class="n">New</span><span class="p">()</span>
+</pre></div></div>
+
+<ul>
+<li>オブジェクトのプロパティ取得<br>
+</li>
+</ul>
+
+<div class="code-frame" data-lang="go"><div class="highlight"><pre><span class="n">obj</span><span class="o">.</span><span class="n">Get</span><span class="p">(</span><span class="s">"プロパティ名"</span><span class="p">)</span>
+</pre></div></div>
+
+<ul>
+<li>オブジェクトのプロパティ設定<br>
+</li>
+</ul>
+
+<div class="code-frame" data-lang="go"><div class="highlight"><pre><span class="n">obj</span><span class="o">.</span><span class="n">Set</span><span class="p">(</span><span class="s">"プロパティ名"</span><span class="p">,</span> <span class="n">値</span><span class="p">)</span>
+</pre></div></div>
+
+<ul>
+<li>オブジェクトの関数実行<br>
+</li>
+</ul>
+
+<div class="code-frame" data-lang="go"><div class="highlight"><pre><span class="n">obj</span><span class="o">.</span><span class="n">Call</span><span class="p">(</span><span class="s">"関数名"</span><span class="p">,</span> <span class="n">引数1</span><span class="p">,</span> <span class="n">引数2</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</pre></div></div>
+
+<p><code>Get</code>で関数取得して<code>Invoke</code>だと<code>this</code>が<code>obj</code>ではなくなると思われる（未検証）</p>
+
+<div class="code-frame" data-lang="go"><div class="highlight"><pre><span class="n">obj</span><span class="o">.</span><span class="n">Get</span><span class="p">(</span><span class="s">"関数名"</span><span class="p">)</span><span class="o">.</span><span class="n">Invoke</span><span class="p">(</span><span class="n">引数1</span><span class="p">,</span> <span class="n">引数2</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</pre></div></div>
+
+<h3>
+<span id="配列" class="fragment"></span><a href="#%E9%85%8D%E5%88%97"><i class="fa fa-link"></i></a>配列</h3>
+
+<ul>
+<li>配列を作る<br>
+</li>
+</ul>
+
+<div class="code-frame" data-lang="go"><div class="highlight"><pre><span class="n">array</span> <span class="o">:=</span> <span class="n">js</span><span class="o">.</span><span class="n">Global</span><span class="p">()</span><span class="o">.</span><span class="n">Get</span><span class="p">(</span><span class="s">"Array"</span><span class="p">)</span><span class="o">.</span><span class="n">New</span><span class="p">()</span>
+</pre></div></div>
+
+<ul>
+<li>配列に追加<br>
+</li>
+</ul>
+
+<div class="code-frame" data-lang="go"><div class="highlight"><pre><span class="n">array</span><span class="o">.</span><span class="n">Call</span><span class="p">(</span><span class="s">"push"</span><span class="p">,</span> <span class="n">値</span><span class="p">)</span>
+</pre></div></div>
+
+<ul>
+<li>配列に追加（インデックス指定）<br>
+</li>
+</ul>
+
+<div class="code-frame" data-lang="go"><div class="highlight"><pre><span class="n">array</span><span class="o">.</span><span class="n">SetIndex</span><span class="p">(</span><span class="n">インデックス</span><span class="p">,</span> <span class="n">値</span><span class="p">)</span>
+</pre></div></div>
+
+<ul>
+<li>配列から削除<br>
+</li>
+</ul>
+
+<div class="code-frame" data-lang="go"><div class="highlight"><pre><span class="n">array</span><span class="o">.</span><span class="n">Call</span><span class="p">(</span><span class="s">"splice"</span><span class="p">,</span> <span class="n">インデックス</span><span class="p">,</span> <span class="m">1</span><span class="p">)</span>
+</pre></div></div>
+
+<ul>
+<li>配列から取得<br>
+</li>
+</ul>
+
+<div class="code-frame" data-lang="go"><div class="highlight"><pre><span class="n">array</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">インデックス</span><span class="p">)</span>
+</pre></div></div>
+
+<ul>
+<li>配列の長さ<br>
+</li>
+</ul>
+
+<div class="code-frame" data-lang="go"><div class="highlight"><pre><span class="n">array</span><span class="o">.</span><span class="n">Get</span><span class="p">(</span><span class="s">"length"</span><span class="p">)</span>
+</pre></div></div>
+
+<ul>
+<li>配列ループ<br>
+</li>
+</ul>
+
+<div class="code-frame" data-lang="go"><div class="highlight"><pre><span class="k">for</span> <span class="n">i</span> <span class="o">:=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">array</span><span class="o">.</span><span class="n">Get</span><span class="p">(</span><span class="s">"length"</span><span class="p">);</span> <span class="n">i</span><span class="o">++</span> <span class="p">{</span>
+  <span class="n">value</span> <span class="o">:=</span> <span class="n">array</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div></div>
+
+<h2>
+<span id="goとjsの連携" class="fragment"></span><a href="#go%E3%81%A8js%E3%81%AE%E9%80%A3%E6%90%BA"><i class="fa fa-link"></i></a>goとjsの連携</h2>
+
+<p>hello worldまではこちらを参考に<br>
+<a href="https://qiita.com/t29wuQ/items/eacd113ee25bc46b3bd0" class="autolink" id="reference-2c3465542be37fff7c2c">https://qiita.com/t29wuQ/items/eacd113ee25bc46b3bd0</a></p>
+
+<p>それっぽい形になったときのタグ<br>
+<a href="https://github.com/miyanokomiya/okaphy/tree/wasm_sample" class="autolink" rel="nofollow noopener" target="_blank">https://github.com/miyanokomiya/okaphy/tree/wasm_sample</a></p>
+
+<h3>
+<span id="やりたいこと" class="fragment"></span><a href="#%E3%82%84%E3%82%8A%E3%81%9F%E3%81%84%E3%81%93%E3%81%A8"><i class="fa fa-link"></i></a>やりたいこと</h3>
+
+<ul>
+<li>jsからgoの関数に引数を渡して実行する</li>
+<li>goの関数からjs側に戻り値を返す</li>
+</ul>
+
+<h3>
+<span id="注意-1" class="fragment"></span><a href="#%E6%B3%A8%E6%84%8F-1"><i class="fa fa-link"></i></a>注意</h3>
+
+<ul>
+<li>最適な方法とは限らない</li>
+<li>全体的に参考にできる資料が少ないので試行錯誤実装</li>
+</ul>
+
+<h3>
+<span id="go側" class="fragment"></span><a href="#go%E5%81%B4"><i class="fa fa-link"></i></a>go側</h3>
+
+<div class="code-frame" data-lang="go"><div class="highlight"><pre><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"syscall/js"</span>
+<span class="p">)</span>
+
+<span class="k">var</span> <span class="n">goWasm</span> <span class="o">=</span> <span class="n">js</span><span class="o">.</span><span class="n">Global</span><span class="p">()</span><span class="o">.</span><span class="n">Get</span><span class="p">(</span><span class="s">"GoWasm"</span><span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">c</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="k">chan</span> <span class="k">struct</span><span class="p">{},</span> <span class="m">0</span><span class="p">)</span>
+
+    <span class="n">wasmWrapper</span><span class="p">(</span><span class="s">"echo"</span><span class="p">,</span> <span class="n">echo</span><span class="p">)</span>
+
+    <span class="n">goWasm</span><span class="o">.</span><span class="n">Call</span><span class="p">(</span><span class="s">"onLoad"</span><span class="p">)</span>
+    <span class="o">&lt;-</span><span class="n">c</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="n">wasmWrapper</span><span class="p">(</span><span class="n">name</span> <span class="kt">string</span><span class="p">,</span> <span class="n">fn</span> <span class="k">func</span><span class="p">(</span><span class="n">value</span> <span class="n">js</span><span class="o">.</span><span class="n">Value</span><span class="p">)</span> <span class="p">(</span><span class="k">interface</span><span class="p">{},</span> <span class="kt">error</span><span class="p">))</span> <span class="p">{</span>
+    <span class="n">handler</span> <span class="o">:=</span> <span class="n">js</span><span class="o">.</span><span class="n">NewCallback</span><span class="p">(</span><span class="k">func</span><span class="p">(</span><span class="n">values</span> <span class="p">[]</span><span class="n">js</span><span class="o">.</span><span class="n">Value</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"exec "</span> <span class="o">+</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">==</span> <span class="m">0</span> <span class="p">{</span>
+            <span class="k">var</span> <span class="n">val</span> <span class="n">js</span><span class="o">.</span><span class="n">Value</span>
+            <span class="n">fn</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="p">}</span>
+
+        <span class="n">arg</span> <span class="o">:=</span> <span class="n">values</span><span class="p">[</span><span class="m">0</span><span class="p">]</span>
+
+        <span class="n">data</span> <span class="o">:=</span> <span class="n">arg</span><span class="o">.</span><span class="n">Get</span><span class="p">(</span><span class="s">"data"</span><span class="p">)</span>
+        <span class="n">res</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">fn</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+            <span class="n">fail</span> <span class="o">:=</span> <span class="n">arg</span><span class="o">.</span><span class="n">Get</span><span class="p">(</span><span class="s">"fail"</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">fail</span> <span class="o">!=</span> <span class="n">js</span><span class="o">.</span><span class="n">Undefined</span><span class="p">()</span> <span class="p">{</span>
+                <span class="n">fail</span><span class="o">.</span><span class="n">Invoke</span><span class="p">(</span><span class="n">err</span><span class="o">.</span><span class="n">Error</span><span class="p">())</span>
+            <span class="p">}</span>
+            <span class="k">return</span>
+        <span class="p">}</span>
+
+        <span class="n">done</span> <span class="o">:=</span> <span class="n">arg</span><span class="o">.</span><span class="n">Get</span><span class="p">(</span><span class="s">"done"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">done</span> <span class="o">!=</span> <span class="n">js</span><span class="o">.</span><span class="n">Undefined</span><span class="p">()</span> <span class="p">{</span>
+            <span class="n">done</span><span class="o">.</span><span class="n">Invoke</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">})</span>
+
+    <span class="n">goWasm</span><span class="o">.</span><span class="n">Get</span><span class="p">(</span><span class="s">"functions"</span><span class="p">)</span><span class="o">.</span><span class="n">Set</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">handler</span><span class="p">)</span>
+    <span class="n">goWasm</span><span class="o">.</span><span class="n">Call</span><span class="p">(</span><span class="s">"onAddFunction"</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="n">echo</span><span class="p">(</span><span class="n">value</span> <span class="n">js</span><span class="o">.</span><span class="n">Value</span><span class="p">)</span> <span class="p">(</span><span class="k">interface</span><span class="p">{},</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">value</span><span class="p">,</span> <span class="no">nil</span>
+<span class="p">}</span>
+</pre></div></div>
+
+<h3>
+<span id="js側" class="fragment"></span><a href="#js%E5%81%B4"><i class="fa fa-link"></i></a>js側</h3>
+
+<div class="code-frame" data-lang="js"><div class="highlight"><pre><span class="nb">window</span><span class="p">.</span><span class="nx">GoWasm</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">functions</span><span class="p">:</span> <span class="p">{},</span>
+  <span class="nx">onAddFunction</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">add wasm function: </span><span class="dl">'</span><span class="p">,</span> <span class="nx">name</span><span class="p">)</span>
+  <span class="p">},</span>
+  <span class="nx">onLoad</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">wasm functions loaded</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">},</span>
+  <span class="nx">init</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">WebAssembly</span><span class="p">.</span><span class="nx">instantiateStreaming</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// polyfill</span>
+      <span class="nx">WebAssembly</span><span class="p">.</span><span class="nx">instantiateStreaming</span> <span class="o">=</span> <span class="k">async</span> <span class="p">(</span><span class="nx">resp</span><span class="p">,</span> <span class="nx">importObject</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="kd">const</span> <span class="nx">source</span> <span class="o">=</span> <span class="k">await</span> <span class="p">(</span><span class="k">await</span> <span class="nx">resp</span><span class="p">).</span><span class="nx">arrayBuffer</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="nx">WebAssembly</span><span class="p">.</span><span class="nx">instantiate</span><span class="p">(</span><span class="nx">source</span><span class="p">,</span> <span class="nx">importObject</span><span class="p">)</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="kd">const</span> <span class="nx">go</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Go</span><span class="p">()</span>
+    <span class="kd">let</span> <span class="nx">mod</span><span class="p">,</span> <span class="nx">inst</span>
+    <span class="nx">WebAssembly</span><span class="p">.</span><span class="nx">instantiateStreaming</span><span class="p">(</span><span class="nx">fetch</span><span class="p">(</span><span class="dl">"</span><span class="s2">main.wasm</span><span class="dl">"</span><span class="p">),</span> <span class="nx">go</span><span class="p">.</span><span class="nx">importObject</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">result</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="nx">mod</span> <span class="o">=</span> <span class="nx">result</span><span class="p">.</span><span class="nx">module</span>
+        <span class="nx">inst</span> <span class="o">=</span> <span class="nx">result</span><span class="p">.</span><span class="nx">instance</span>
+        <span class="nx">go</span><span class="p">.</span><span class="nx">run</span><span class="p">(</span><span class="nx">inst</span><span class="p">)</span>
+      <span class="p">})</span>
+      <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">GoWasm</span><span class="p">.</span><span class="nx">init</span><span class="p">()</span>
+
+</pre></div></div>
+
+<h3>
+<span id="使い方" class="fragment"></span><a href="#%E4%BD%BF%E3%81%84%E6%96%B9"><i class="fa fa-link"></i></a>使い方</h3>
+
+<p><code>GoWasm.onLoad</code>が実行された後はこんな感じにgoの関数を実行できる。</p>
+
+<div class="code-frame" data-lang="js"><div class="highlight"><pre><span class="nx">GoWasm</span><span class="p">.</span><span class="nx">functions</span><span class="p">.</span><span class="nx">echo</span><span class="p">({</span>
+  <span class="na">data</span><span class="p">:</span> <span class="dl">'</span><span class="s1">hello go</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">done</span><span class="p">:</span> <span class="nx">data</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+  <span class="p">},</span>
+  <span class="na">fail</span><span class="p">:</span> <span class="nx">console</span><span class="p">.</span><span class="nx">error</span>
+<span class="p">})</span>
+</pre></div></div>
+
+<h3>
+<span id="補足" class="fragment"></span><a href="#%E8%A3%9C%E8%B6%B3"><i class="fa fa-link"></i></a>補足</h3>
+
+<p>常に非同期な実行となるので注意。</p>
+
+<p>wasmの仕様としては同期実行もできるっぽいが、<code>wasm_exec.js</code>で色々やっている都合なのか同期実行する方法にはたどり着けず。</p>

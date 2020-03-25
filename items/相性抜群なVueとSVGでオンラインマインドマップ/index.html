@@ -1,0 +1,208 @@
+
+<h1>
+<span id="svgの熱" class="fragment"></span><a href="#svg%E3%81%AE%E7%86%B1"><i class="fa fa-link"></i></a>SVGの熱</h1>
+
+<p>最近Vueが熱いですよね！Reactに迫る勢いで激熱ですね！！そしてみなさんご存知のようにSVGも激熱々真っ盛りですね！！！</p>
+
+<h2>
+<span id="ご存じない" class="fragment"></span><a href="#%E3%81%94%E5%AD%98%E3%81%98%E3%81%AA%E3%81%84"><i class="fa fa-link"></i></a>ご存じない？</h2>
+
+<p>という雰囲気にいてもたってもいられないSVG芸人の端くれとして、相性抜群(と勝手に結論付けている)Vueと組み合わせてさくっとマインドマップを作れるwebサービスを緩やかな速度で立ち上げてみました。<br>
+<a href="https://mind-xx-acpr.firebaseapp.com/" class="autolink" rel="nofollow noopener" target="_blank">https://mind-xx-acpr.firebaseapp.com/</a></p>
+
+<h2>
+<span id="なにこれ" class="fragment"></span><a href="#%E3%81%AA%E3%81%AB%E3%81%93%E3%82%8C"><i class="fa fa-link"></i></a>なにこれ？</h2>
+
+<p><a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F5ed6e5af-9496-524d-e2b5-0f53e29ec46e.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=03ccb185980548124368477f3b7dadcc" target="_blank" rel="nofollow noopener"><img src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F5ed6e5af-9496-524d-e2b5-0f53e29ec46e.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=03ccb185980548124368477f3b7dadcc" alt="demo1-iloveimg-compressed.gif" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/172228/5ed6e5af-9496-524d-e2b5-0f53e29ec46e.gif" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F5ed6e5af-9496-524d-e2b5-0f53e29ec46e.gif?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=4ab914895e2879a6767dca7c7369f238 1x" loading="lazy"></a></p>
+
+<p>かの有名なマインドマップツール<a href="http://jp.xmind.net/" rel="nofollow noopener" target="_blank">XMind</a>がクラウド路線から撤退するというニュースを見てやけになって自分用に作ったweb100%なマインドマップツールです。当初はMindXにしようと思いましたが、流石に怒られる気がしたので色々付け足しました。</p>
+
+<p>メインとなるマインドマップ部分はSVG、編集用ボタンなど周辺のものはHTMLと両者を組み合わせて作っています。<br>
+完全にどちらかで統一してしまうこともできますが、それぞれの特性を活かせるように使い分けることもできます。今回の場合、編集用ボタンは常に同じ大きさで表示したい＆<a href="https://vuetifyjs.com/ja/" rel="nofollow noopener" target="_blank">Vuetify</a>のコンポーネントを使って楽したかったのでHTMLを採用しています。</p>
+
+<h1>
+<span id="vueとsvg" class="fragment"></span><a href="#vue%E3%81%A8svg"><i class="fa fa-link"></i></a>VueとSVG</h1>
+
+<p>作ったもの宣伝だけで終わってしまいそうなので機能紹介などは最後にして、先にVueとSVGの相性について色々感じたことを書いていきます。</p>
+
+<h2>
+<span id="相性抜群" class="fragment"></span><a href="#%E7%9B%B8%E6%80%A7%E6%8A%9C%E7%BE%A4"><i class="fa fa-link"></i></a>相性抜群</h2>
+
+<p>SVGはXMLなのでHTMLと雰囲気はほとんど同じです。そして嬉しいことにブラウザはSVGをそのまま認識してくれます。つまりVueのtemplateにそのままSVGを書くことができ、HTMLのタグと全く同じように扱えてしまうのです。</p>
+
+<p>これが意味することは、</p>
+
+<ul>
+<li>コンポーネント化の思想をそのままSVGの世界に持ち込むことができる</li>
+<li>SVGのプロパティを簡単にリアクティブにできる</li>
+<li>SVGのイベントハンドリングがHTMLと同じ気分で簡単にできる</li>
+</ul>
+
+<p>というわけです！<br>
+もちろんSVG本来の機能はそのまま使える(アニメーション系はブラウザ対応微妙かも‥)ので、SVGの味を損なうことなく、javascriptという強力な言語で宣言的に制御することができてしまいます。</p>
+
+<h2>
+<span id="canvasじゃだめなの" class="fragment"></span><a href="#canvas%E3%81%98%E3%82%83%E3%81%A0%E3%82%81%E3%81%AA%E3%81%AE"><i class="fa fa-link"></i></a>canvasじゃだめなの？</h2>
+
+<p>SVGで実現できることは大抵canvasでも実現できますが、決定的に異なるのは、canvasは一枚絵を描画する単一の要素であるということです。つまりコンポーネントとして階層的に管理することも、イベントハンドラを要素ごとに設定していくこともできません。<br>
+もしやりたいのならその仕組みを自前で作り上げていく必要があり、とても手がかかること間違いなしです。<br>
+canvasとSVGの詳細な比較まではここでは行いませんが、Vueとの相性の良さという点では圧倒的にSVGをお勧めします。</p>
+
+<p>作図ツールで有名な<a href="https://cacoo.com/ja/" rel="nofollow noopener" target="_blank">Cacoo</a>のブログにてSVGとcanvasの比較が行われているので興味ある方はどうぞ。使い方にもよるはずですが、SVGはパフォーマンス的にも申し分ないようです。<br>
+<a href="https://nulab-inc.com/ja/blog/cacoo/cacoo-use-html5-svg/" class="autolink" rel="nofollow noopener" target="_blank">https://nulab-inc.com/ja/blog/cacoo/cacoo-use-html5-svg/</a></p>
+
+<p>一応補足しておくと、決してcanvas下げをしたいわけではないです。描画機能の多彩さではcanvasが優勢でしょうし、パフォーマンスについてもレイヤー化やプリレンダリングなど工夫の余地はいくらでもあります。実際自分も以前は仕事でバリバリcanvas芸人していました。<br>
+あくまでもVueとの相性の良さと扱いやすさという点ではSVGが圧倒的に良いということです。</p>
+
+<h2>
+<span id="reactでもいいんじゃないの" class="fragment"></span><a href="#react%E3%81%A7%E3%82%82%E3%81%84%E3%81%84%E3%82%93%E3%81%98%E3%82%83%E3%81%AA%E3%81%84%E3%81%AE"><i class="fa fa-link"></i></a>Reactでもいいんじゃないの？</h2>
+
+<p>むむむむ、否定はできません。<br>
+実際に以前ReactとSVGで似た雰囲気のものを作ったことがありますが、Vueじゃないとだめだ！と断言できるほどの理由は見つけられていません。もちろんその逆も然りです。</p>
+
+<p>敢えて挙げるなら、SVGはハイフン付きの属性名が多く、Reactではいちいちキャメルケースに直して渡さないといけなかったのが面倒だった覚えがあります。<br>
+とはいえ致命的な欠点ではないです。この際どちらでもいいです、Angularでもいです、わかりましたjQueryでもいいです、<strong>とにかくSVGで何か作りましょう</strong>。</p>
+
+<h1>
+<span id="ざっくりとした紹介" class="fragment"></span><a href="#%E3%81%96%E3%81%A3%E3%81%8F%E3%82%8A%E3%81%A8%E3%81%97%E3%81%9F%E7%B4%B9%E4%BB%8B"><i class="fa fa-link"></i></a>ざっくりとした紹介</h1>
+
+<p>ここら先は作ったのものをざっくりと紹介していくだけです。</p>
+
+<h2>
+<span id="マインドマップ機能" class="fragment"></span><a href="#%E3%83%9E%E3%82%A4%E3%83%B3%E3%83%89%E3%83%9E%E3%83%83%E3%83%97%E6%A9%9F%E8%83%BD"><i class="fa fa-link"></i></a>マインドマップ機能</h2>
+
+<h3>
+<span id="ノードツリー作成" class="fragment"></span><a href="#%E3%83%8E%E3%83%BC%E3%83%89%E3%83%84%E3%83%AA%E3%83%BC%E4%BD%9C%E6%88%90"><i class="fa fa-link"></i></a>ノードツリー作成</h3>
+
+<p>マインドマップ作成のための最低限機能は多分入ってます。<br>
+位置調整は自動なので配置に時間を割かれる心配はありません。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F29fb3d99-b1ac-2a20-3140-eeaf0b7c6b8d.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=4cef956eb9c3455999632d394b06314c" target="_blank" rel="nofollow noopener"><img width="804" alt="スクリーンショット 2018-04-15 11.31.14.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F29fb3d99-b1ac-2a20-3140-eeaf0b7c6b8d.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=4cef956eb9c3455999632d394b06314c" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/172228/29fb3d99-b1ac-2a20-3140-eeaf0b7c6b8d.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F29fb3d99-b1ac-2a20-3140-eeaf0b7c6b8d.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=9b2712d8a4b057bbb0c9cd3df21cfd45 1x" loading="lazy"></a></p>
+
+<h3>
+<span id="ノードにコメント" class="fragment"></span><a href="#%E3%83%8E%E3%83%BC%E3%83%89%E3%81%AB%E3%82%B3%E3%83%A1%E3%83%B3%E3%83%88"><i class="fa fa-link"></i></a>ノードにコメント</h3>
+
+<p>子ノード作れよと思いましたがやはりコメント機能は便利です。ユーザーはまだ自分だけなので完全にメモ書き用になっています。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2Fa23d3836-7da8-6826-9b48-797e2e86b340.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=6f32cb8abb51033b40b29b336167cee5" target="_blank" rel="nofollow noopener"><img width="415" alt="スクリーンショット 2018-04-15 11.05.42.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2Fa23d3836-7da8-6826-9b48-797e2e86b340.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=6f32cb8abb51033b40b29b336167cee5" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/172228/a23d3836-7da8-6826-9b48-797e2e86b340.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2Fa23d3836-7da8-6826-9b48-797e2e86b340.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=00dd0268dcdc59c155701389a20262b0 1x" loading="lazy"></a></p>
+
+<h3>
+<span id="ノードにチェックボックス" class="fragment"></span><a href="#%E3%83%8E%E3%83%BC%E3%83%89%E3%81%AB%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%E3%83%9C%E3%83%83%E3%82%AF%E3%82%B9"><i class="fa fa-link"></i></a>ノードにチェックボックス</h3>
+
+<p>色で管理すればいいじゃんと思ってましたが、やはりTODOはチェックボックスになってた方が捗りました。<br>
+<a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F1b73c9f9-ef71-7d62-7dac-6ca785750ba8.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=d70eabc35a09b97b9f8e6ad70da1a048" target="_blank" rel="nofollow noopener"><img width="344" alt="スクリーンショット 2018-04-15 11.02.28.png" src="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F1b73c9f9-ef71-7d62-7dac-6ca785750ba8.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;s=d70eabc35a09b97b9f8e6ad70da1a048" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/172228/1b73c9f9-ef71-7d62-7dac-6ca785750ba8.png" srcset="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.amazonaws.com%2F0%2F172228%2F1b73c9f9-ef71-7d62-7dac-6ca785750ba8.png?ixlib=rb-1.2.2&amp;auto=format&amp;gif-q=60&amp;q=75&amp;w=1400&amp;fit=max&amp;s=7a2774e05a640254c8304554f75a30db 1x" loading="lazy"></a></p>
+
+<h3>
+<span id="svg出力" class="fragment"></span><a href="#svg%E5%87%BA%E5%8A%9B"><i class="fa fa-link"></i></a>SVG出力</h3>
+
+<p>SVGはただのテキストファイルなのでDOMをそのままシリアライズするだけです。<br>
+SVGのスタイルもCSSで制御できますが、純粋なSVGではなくなってしまうので可能な限りCSSに頼らずSVG仕様のスタイル指定を行うのが吉です。</p>
+
+<h2>
+<span id="周辺機能" class="fragment"></span><a href="#%E5%91%A8%E8%BE%BA%E6%A9%9F%E8%83%BD"><i class="fa fa-link"></i></a>周辺機能</h2>
+
+<h3>
+<span id="モバイル対応" class="fragment"></span><a href="#%E3%83%A2%E3%83%90%E3%82%A4%E3%83%AB%E5%AF%BE%E5%BF%9C"><i class="fa fa-link"></i></a>モバイル対応</h3>
+
+<p>スマホで使えないとか許されませんよね！<br>
+ただノードが大量になると動作が重くなってくるという課題が残っています。描画自体に時間がかかってしまっているようなので、どうにかして描画の軽量化をしたいんですがいい案は思い浮かばず..</p>
+
+<h3>
+<span id="ファイル権限制御" class="fragment"></span><a href="#%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E6%A8%A9%E9%99%90%E5%88%B6%E5%BE%A1"><i class="fa fa-link"></i></a>ファイル権限制御</h3>
+
+<p>ファイルの閲覧、編集権限をユーザーごとに設定できます。<br>
+パブリックファイルにすればログインも不要で閲覧や編集させることもできます。<br>
+ちなみにユーザーはまだ自分一人なので無意味と思いきや、私物アカウントと会社アカウントでファイル共有できるのでものすごく便利です。<br>
+ユーザー招待までは対応していないので、予め認証を済ませたメールアドレスに対してしか権限設定はできません..</p>
+
+<h3>
+<span id="androidはホーム画面に追加できます" class="fragment"></span><a href="#android%E3%81%AF%E3%83%9B%E3%83%BC%E3%83%A0%E7%94%BB%E9%9D%A2%E3%81%AB%E8%BF%BD%E5%8A%A0%E3%81%A7%E3%81%8D%E3%81%BE%E3%81%99"><i class="fa fa-link"></i></a>Androidはホーム画面に追加できます！</h3>
+
+<p>スタンドアロン設定なのでアドレスバーなどか消えて快適になります。<br>
+SVGのついでにPWAもガンガン推していきましょう。</p>
+
+<h3>
+<span id="google認証firebaseさんありがとう" class="fragment"></span><a href="#google%E8%AA%8D%E8%A8%BCfirebase%E3%81%95%E3%82%93%E3%81%82%E3%82%8A%E3%81%8C%E3%81%A8%E3%81%86"><i class="fa fa-link"></i></a>Google認証(Firebaseさんありがとう！)</h3>
+
+<p>開発者側の認識実装の手間まで大幅削減してくれるFirebaseすごいの一言に尽きます。<br>
+アカウント削除もちゃんと用意したのでご安心ください。<br>
+とりあえず触ってみたいのであれば認証不要の<a href="https://mind-xx-acpr.firebaseapp.com/map/-L1kyhrBlrHGorkL4ws_" rel="nofollow noopener" target="_blank">パブリックファイル</a>を用意したのでどうぞ。</p>
+
+<h3>
+<span id="リアルタイム共同編集firebaseさんありがとう" class="fragment"></span><a href="#%E3%83%AA%E3%82%A2%E3%83%AB%E3%82%BF%E3%82%A4%E3%83%A0%E5%85%B1%E5%90%8C%E7%B7%A8%E9%9B%86firebase%E3%81%95%E3%82%93%E3%81%82%E3%82%8A%E3%81%8C%E3%81%A8%E3%81%86"><i class="fa fa-link"></i></a>リアルタイム共同編集(Firebaseさんありがとう！)</h3>
+
+<p>これぞSaaSにおけるファイル編集の醍醐味です。<br>
+WebSocketまでもサーバーレスで用意してしまうFirebaseさんに敬意を払いましょう。</p>
+
+<h3>
+<span id="オフラインファイル編集firebaseさんありがとう" class="fragment"></span><a href="#%E3%82%AA%E3%83%95%E3%83%A9%E3%82%A4%E3%83%B3%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E7%B7%A8%E9%9B%86firebase%E3%81%95%E3%82%93%E3%81%82%E3%82%8A%E3%81%8C%E3%81%A8%E3%81%86"><i class="fa fa-link"></i></a>オフラインファイル編集(Firebaseさんありがとう！)</h3>
+
+<p>よくわかりませんが勝手にいい感じにしてくれてオフライン操作もできるらしいです！<br>
+ただServiceWorkerとかはないので、ページをオフラインで開くことはできません。</p>
+
+<h2>
+<span id="システム構成" class="fragment"></span><a href="#%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E6%A7%8B%E6%88%90"><i class="fa fa-link"></i></a>システム構成</h2>
+
+<h3>
+<span id="firebaseおんぶに抱っこのサーバーレスspa" class="fragment"></span><a href="#firebase%E3%81%8A%E3%82%93%E3%81%B6%E3%81%AB%E6%8A%B1%E3%81%A3%E3%81%93%E3%81%AE%E3%82%B5%E3%83%BC%E3%83%90%E3%83%BC%E3%83%AC%E3%82%B9spa"><i class="fa fa-link"></i></a>Firebaseおんぶに抱っこのサーバーレスSPA</h3>
+
+<p>ホスティングもDBもWebSocketもCloudFunctionもまるっと全部用意してくれるFarebaseさんの太っ腹さに感無量です。</p>
+
+<h3>
+<span id="vuevuexvue-routerのvueフルセット" class="fragment"></span><a href="#vuevuexvue-router%E3%81%AEvue%E3%83%95%E3%83%AB%E3%82%BB%E3%83%83%E3%83%88"><i class="fa fa-link"></i></a>Vue、Vuex、vue-routerのVueフルセット</h3>
+
+<p>ドキュメントの素晴らしさを見ればフレームワークの素晴らしさにも疑いの余地はありません。</p>
+
+<h2>
+<span id="ごめんなさい" class="fragment"></span><a href="#%E3%81%94%E3%82%81%E3%82%93%E3%81%AA%E3%81%95%E3%81%84"><i class="fa fa-link"></i></a>ごめんなさい</h2>
+
+<h3>
+<span id="ieで動くかは知りません" class="fragment"></span><a href="#ie%E3%81%A7%E5%8B%95%E3%81%8F%E3%81%8B%E3%81%AF%E7%9F%A5%E3%82%8A%E3%81%BE%E3%81%9B%E3%82%93"><i class="fa fa-link"></i></a>IEで動くかは知りません</h3>
+
+<p>no idea</p>
+
+<h3>
+<span id="自分用なのでmacトラックパッドに操作が最適化されてる節があります" class="fragment"></span><a href="#%E8%87%AA%E5%88%86%E7%94%A8%E3%81%AA%E3%81%AE%E3%81%A7mac%E3%83%88%E3%83%A9%E3%83%83%E3%82%AF%E3%83%91%E3%83%83%E3%83%89%E3%81%AB%E6%93%8D%E4%BD%9C%E3%81%8C%E6%9C%80%E9%81%A9%E5%8C%96%E3%81%95%E3%82%8C%E3%81%A6%E3%82%8B%E7%AF%80%E3%81%8C%E3%81%82%E3%82%8A%E3%81%BE%E3%81%99"><i class="fa fa-link"></i></a>自分用なのでmacトラックパッドに操作が最適化されてる節があります</h3>
+
+<p>トラックパッドの二本指スクロールが好きなのです。</p>
+
+<h3>
+<span id="完全無料稼働なのでドメインはfirebaseデフォルトままです" class="fragment"></span><a href="#%E5%AE%8C%E5%85%A8%E7%84%A1%E6%96%99%E7%A8%BC%E5%83%8D%E3%81%AA%E3%81%AE%E3%81%A7%E3%83%89%E3%83%A1%E3%82%A4%E3%83%B3%E3%81%AFfirebase%E3%83%87%E3%83%95%E3%82%A9%E3%83%AB%E3%83%88%E3%81%BE%E3%81%BE%E3%81%A7%E3%81%99"><i class="fa fa-link"></i></a>完全無料稼働なのでドメインはFirebaseデフォルトままです</h3>
+
+<p>初期設定の美学ってあるじゃないですか？</p>
+
+<h3>
+<span id="完全無料稼働なのでfirebaseの利用限度も無料枠です" class="fragment"></span><a href="#%E5%AE%8C%E5%85%A8%E7%84%A1%E6%96%99%E7%A8%BC%E5%83%8D%E3%81%AA%E3%81%AE%E3%81%A7firebase%E3%81%AE%E5%88%A9%E7%94%A8%E9%99%90%E5%BA%A6%E3%82%82%E7%84%A1%E6%96%99%E6%9E%A0%E3%81%A7%E3%81%99"><i class="fa fa-link"></i></a>完全無料稼働なのでFirebaseの利用限度も無料枠です</h3>
+
+<p>同時接続上限100、データロード月10GBとかです。ちなみにユーザーはまだ自分だけです。</p>
+
+<h2>
+<span id="開発環境など" class="fragment"></span><a href="#%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83%E3%81%AA%E3%81%A9"><i class="fa fa-link"></i></a>開発環境など</h2>
+
+<h3>
+<span id="gitlab" class="fragment"></span><a href="#gitlab"><i class="fa fa-link"></i></a>Gitlab</h3>
+
+<p>なんとなくprivateリポジトリにしたくて使い始めましたが無料枠機能の充実さごいです。</p>
+
+<h3>
+<span id="webpack" class="fragment"></span><a href="#webpack"><i class="fa fa-link"></i></a>Webpack</h3>
+
+<p>ご存じ</p>
+
+<h3>
+<span id="veutify" class="fragment"></span><a href="#veutify"><i class="fa fa-link"></i></a>Veutify</h3>
+
+<p>祝1.0リリース</p>
+
+<h3>
+<span id="jest" class="fragment"></span><a href="#jest"><i class="fa fa-link"></i></a>Jest</h3>
+
+<p>最近イケイケ。git見ての差分watchがしばらくバグってる。</p>
+
+<h3>
+<span id="storybook" class="fragment"></span><a href="#storybook"><i class="fa fa-link"></i></a>Storybook</h3>
+
+<p>SVGに負けず劣らずの一大ムーブメント待った無し。</p>
+
+<h3>
+<span id="puppeteer" class="fragment"></span><a href="#puppeteer"><i class="fa fa-link"></i></a>Puppeteer</h3>
+
+<p>Storybook上でコンポーネントごとにe2eするのを個人的に実験中。もはやe2eとは呼べないがコンポーネントテストの未来を感じる。</p>

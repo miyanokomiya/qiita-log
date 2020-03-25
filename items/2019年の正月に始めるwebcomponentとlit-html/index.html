@@ -1,0 +1,126 @@
+
+<h2>
+<span id="前置き" class="fragment"></span><a href="#%E5%89%8D%E7%BD%AE%E3%81%8D"><i class="fa fa-link"></i></a>前置き</h2>
+
+<p><a href="https://qiita.com/aggre/items/3ed2558a9fb8ba887385" class="autolink" id="reference-bd3793fbf389b191530b">https://qiita.com/aggre/items/3ed2558a9fb8ba887385</a><br>
+こちらの記事を大いに参考にさせてもらいました。被っている内容もあります。<br>
+この分野周辺の変遷が早すぎるせいか変わっている部分がそこそこあったので、動かすための備忘録です。</p>
+
+<h2>
+<span id="コンポーネント全容" class="fragment"></span><a href="#%E3%82%B3%E3%83%B3%E3%83%9D%E3%83%BC%E3%83%8D%E3%83%B3%E3%83%88%E5%85%A8%E5%AE%B9"><i class="fa fa-link"></i></a>コンポーネント全容</h2>
+
+<p>とりえあず動かせたコンポーネントの全体像。</p>
+
+<ul>
+<li>html側</li>
+</ul>
+
+<div class="code-frame" data-lang="html"><div class="highlight"><pre><span class="nt">&lt;x-product</span> <span class="na">name=</span><span class="s">"JavaScript"</span> <span class="na">src=</span><span class="s">"imageSrc"</span> <span class="nt">/&gt;</span>
+</pre></div></div>
+
+<ul>
+<li>js側</li>
+</ul>
+
+<div class="code-frame" data-lang="js"><div class="highlight"><pre><span class="k">import</span> <span class="p">{</span> <span class="nx">html</span><span class="p">,</span> <span class="nx">render</span> <span class="k">as</span> <span class="nx">litRender</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">lit-html</span><span class="dl">'</span>
+
+<span class="kd">function</span> <span class="nx">render</span> <span class="p">(</span><span class="nx">h</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">litRender</span><span class="p">(</span><span class="nx">h</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">shadowRoot</span> <span class="o">||</span> <span class="nx">c</span><span class="p">.</span><span class="nx">attachShadow</span><span class="p">({</span> <span class="na">mode</span><span class="p">:</span> <span class="dl">'</span><span class="s1">open</span><span class="dl">'</span> <span class="p">}))</span>
+<span class="p">}</span>
+
+<span class="kd">class</span> <span class="nx">XProduct</span> <span class="kd">extends</span> <span class="nx">HTMLElement</span> <span class="p">{</span>
+  <span class="kd">static</span> <span class="kd">get</span> <span class="nx">observedAttributes</span> <span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="p">[</span><span class="dl">'</span><span class="s1">name</span><span class="dl">'</span><span class="p">]</span> <span class="p">}</span>
+  <span class="kd">constructor</span> <span class="p">()</span> <span class="p">{</span> <span class="k">super</span><span class="p">()</span> <span class="p">}</span>
+
+  <span class="nx">html</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">src</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">html</span><span class="s2">`&lt;img alt="</span><span class="p">${</span><span class="nx">name</span><span class="p">}</span><span class="s2">" src="</span><span class="p">${</span><span class="nx">src</span><span class="p">}</span><span class="s2">" @click="</span><span class="p">${()</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">onClick</span><span class="p">()}</span><span class="s2">" /&gt;`</span>
+  <span class="p">}</span>
+
+  <span class="nx">connectedCallback</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">name</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="dl">'</span><span class="s1">name</span><span class="dl">'</span><span class="p">)</span>
+    <span class="kd">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="dl">'</span><span class="s1">src</span><span class="dl">'</span><span class="p">)</span>
+    <span class="nx">render</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">html</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">src</span><span class="p">),</span> <span class="k">this</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="nx">attributeChangedCallback</span> <span class="p">(</span><span class="nx">attributeName</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">oldValue</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">newValue</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">namespace</span><span class="p">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">attributeChangedCallback</span><span class="dl">'</span><span class="p">,</span> <span class="nx">attributeName</span><span class="p">,</span> <span class="nx">oldValue</span><span class="p">,</span> <span class="nx">newValue</span><span class="p">,</span> <span class="nx">namespace</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="nx">onClick</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="dl">'</span><span class="s1">src</span><span class="dl">'</span><span class="p">))</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="nx">customElements</span><span class="p">.</span><span class="nx">define</span><span class="p">(</span><span class="dl">'</span><span class="s1">x-product</span><span class="dl">'</span><span class="p">,</span> <span class="nx">XProduct</span><span class="p">)</span>
+
+</pre></div></div>
+
+<h2>
+<span id="ポイント" class="fragment"></span><a href="#%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88"><i class="fa fa-link"></i></a>ポイント</h2>
+
+<h3>
+<span id="constructor内でattributeは参照できない" class="fragment"></span><a href="#constructor%E5%86%85%E3%81%A7attribute%E3%81%AF%E5%8F%82%E7%85%A7%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%84"><i class="fa fa-link"></i></a>constructor内でattributeは参照できない</h3>
+
+<p>2017年から既出っぽいが、webcomponentの使い方で調べると<code>constructor</code>内で<code>getAttribute</code>している内容が多い。<br>
+何か歴史的変遷があったのかもしれない。とりあえず現時点では取得できない。</p>
+
+<p><code>connectedCallback</code>内であれば取得できるのでそちらで初期化する。</p>
+
+<div class="code-frame" data-lang="js"><div class="highlight"><pre>  <span class="nx">connectedCallback</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">name</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="dl">'</span><span class="s1">name</span><span class="dl">'</span><span class="p">)</span>
+    <span class="kd">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="dl">'</span><span class="s1">src</span><span class="dl">'</span><span class="p">)</span>
+    <span class="nx">render</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">html</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">src</span><span class="p">),</span> <span class="k">this</span><span class="p">)</span>
+  <span class="p">}</span>
+</pre></div></div>
+
+<p><a href="https://stackoverflow.com/questions/42719914/custom-element-class-this-getattributedata-returns-null" class="autolink" rel="nofollow noopener" target="_blank">https://stackoverflow.com/questions/42719914/custom-element-class-this-getattributedata-returns-null</a></p>
+
+<h3>
+<span id="イベントハンドラは" class="fragment"></span><a href="#%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88%E3%83%8F%E3%83%B3%E3%83%89%E3%83%A9%E3%81%AF"><i class="fa fa-link"></i></a>イベントハンドラは<code>@</code>
+</h3>
+
+<div class="code-frame" data-lang="js"><div class="highlight"><pre><span class="nx">html</span><span class="s2">`&lt;img alt="</span><span class="p">${</span><span class="nx">name</span><span class="p">}</span><span class="s2">" src="</span><span class="p">${</span><span class="nx">src</span><span class="p">}</span><span class="s2">" @click="</span><span class="p">${()</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">onClick</span><span class="p">()}</span><span class="s2">" /&gt;`</span>
+</pre></div></div>
+
+<p><a href="https://qiita.com/aggre/items/3ed2558a9fb8ba887385#vanilla-web-components--lit-html" id="reference-bd3793fbf389b191530b">以前</a>は拡張機能扱いでまだ仕様が揺れていたようだが、今は標準機能入りしてVue.jsっぽい定義方法になっている。</p>
+
+<p><a href="https://lit-html.polymer-project.org/guide/writing-templates#add-event-handlers" class="autolink" rel="nofollow noopener" target="_blank">https://lit-html.polymer-project.org/guide/writing-templates#add-event-handlers</a></p>
+
+<h3>
+<span id="attributechangedcallbackの監視対象は明示する必要がある" class="fragment"></span><a href="#attributechangedcallback%E3%81%AE%E7%9B%A3%E8%A6%96%E5%AF%BE%E8%B1%A1%E3%81%AF%E6%98%8E%E7%A4%BA%E3%81%99%E3%82%8B%E5%BF%85%E8%A6%81%E3%81%8C%E3%81%82%E3%82%8B"><i class="fa fa-link"></i></a><code>attributeChangedCallback</code>の監視対象は明示する必要がある</h3>
+
+<p><code>observedAttributes</code>という<code>static</code>メソッドで<code>return</code>された属性名のみが<code>attributeChangedCallback</code>の監視対象となる。<br>
+マウント時点で監視対象属性に値が入っている場合、<code>connectedCallback</code>より前に<code>attributeChangedCallback</code>が実行される。</p>
+
+<div class="code-frame" data-lang="js"><div class="highlight"><pre><span class="kd">static</span> <span class="kd">get</span> <span class="nx">observedAttributes</span> <span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="p">[</span><span class="dl">'</span><span class="s1">name</span><span class="dl">'</span><span class="p">]</span> <span class="p">}</span>
+
+<span class="nx">attributeChangedCallback</span> <span class="p">(</span><span class="nx">attributeName</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">oldValue</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">newValue</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">namespace</span><span class="p">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">attributeName</span><span class="p">,</span> <span class="nx">oldValue</span><span class="p">,</span> <span class="nx">newValue</span><span class="p">,</span> <span class="nx">namespace</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div></div>
+
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements#Using_the_lifecycle_callbacks" class="autolink" rel="nofollow noopener" target="_blank">https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements#Using_the_lifecycle_callbacks</a></p>
+
+<h3>
+<span id="shadow-domの初期化は一度だけ" class="fragment"></span><a href="#shadow-dom%E3%81%AE%E5%88%9D%E6%9C%9F%E5%8C%96%E3%81%AF%E4%B8%80%E5%BA%A6%E3%81%A0%E3%81%91"><i class="fa fa-link"></i></a>shadow domの初期化は一度だけ</h3>
+
+<p><code>attachShadow</code>を２回実行するとエラーになるので、２回目移行は<code>shadowRoot</code>を参照する必要がある。<br>
+先人に倣って関数に切り出したが、<code>constructor</code>で<code>attachShadow</code>しておき、後は<code>shadowRoot</code>を使うという風にするだけでいいかもしれない。</p>
+
+<div class="code-frame" data-lang="js"><div class="highlight"><pre><span class="kd">function</span> <span class="nx">render</span> <span class="p">(</span><span class="nx">h</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">litRender</span><span class="p">(</span><span class="nx">h</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">shadowRoot</span> <span class="o">||</span> <span class="nx">c</span><span class="p">.</span><span class="nx">attachShadow</span><span class="p">({</span> <span class="na">mode</span><span class="p">:</span> <span class="dl">'</span><span class="s1">open</span><span class="dl">'</span> <span class="p">}))</span>
+<span class="p">}</span>
+</pre></div></div>
+
+<p><a href="https://qiita.com/aggre/items/3ed2558a9fb8ba887385#%E3%82%A2%E3%83%83%E3%83%97%E3%83%87%E3%83%BC%E3%83%88%E3%81%AB%E5%AF%BE%E5%BF%9C%E3%81%99%E3%82%8B" class="autolink" id="reference-bd3793fbf389b191530b">https://qiita.com/aggre/items/3ed2558a9fb8ba887385#%E3%82%A2%E3%83%83%E3%83%97%E3%83%87%E3%83%BC%E3%83%88%E3%81%AB%E5%AF%BE%E5%BF%9C%E3%81%99%E3%82%8B</a></p>
+
+<h2>
+<span id="おまけ" class="fragment"></span><a href="#%E3%81%8A%E3%81%BE%E3%81%91"><i class="fa fa-link"></i></a>おまけ</h2>
+
+<h3>
+<span id="es5トランスパイルは不可" class="fragment"></span><a href="#es5%E3%83%88%E3%83%A9%E3%83%B3%E3%82%B9%E3%83%91%E3%82%A4%E3%83%AB%E3%81%AF%E4%B8%8D%E5%8F%AF"><i class="fa fa-link"></i></a>es5トランスパイルは不可</h3>
+
+<p>es2015のclass機能が必要なので、es5へトランスパイルしているとエラーになる。<br>
+es2015非対応ブラウザがwebcomponentに対応しているわけがないので潔く切る。</p>
+
+<div class="code-frame" data-lang="text"><div class="highlight"><pre>Failed to construct 'HTMLElement': Please use the 'new' operator, this DOM object constructor cannot be called as a function.
+</pre></div></div>

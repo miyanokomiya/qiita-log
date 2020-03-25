@@ -1,0 +1,13 @@
+<p>下記を参考にすると、<br>
+<a href="https://github.com/junegunn/fzf.vim/issues/276#issuecomment-268408009" class="autolink" rel="nofollow noopener" target="_blank">https://github.com/junegunn/fzf.vim/issues/276#issuecomment-268408009</a><br>
+<a href="https://github.com/junegunn/fzf/issues/337#issuecomment-136389913" class="autolink" rel="nofollow noopener" target="_blank">https://github.com/junegunn/fzf/issues/337#issuecomment-136389913</a></p>
+
+<p>↓でいけるようです。</p>
+
+<div class="code-frame" data-lang="vim"><div class="highlight"><pre>
+<span class="c">" for Files</span>
+<span class="k">let</span> $FZF_DEFAULT_COMMAND <span class="p">=</span> <span class="s1">'ag --hidden --ignore .git -g ""'</span>
+<span class="c">" for Ag</span>
+autocmd <span class="nb">VimEnter</span> * command<span class="p">!</span> <span class="p">-</span>bang <span class="p">-</span>nargs<span class="p">=</span>* Ag
+<span class="se">  \</span> <span class="k">call</span> fzf#<span class="k">vim</span>#ag<span class="p">(&lt;</span><span class="k">q</span><span class="p">-</span>args<span class="p">&gt;,</span> <span class="s1">'--hidden --ignore .git'</span><span class="p">,</span> <span class="p">&lt;</span>bang<span class="p">&gt;</span><span class="m">0</span><span class="p">)</span>
+</pre></div></div>
